@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetSettingsQueryKey } from "@workspace/api-client-react";
-import { Save } from "lucide-react";
+import { Save, KeyRound, Loader2 } from "lucide-react";
 
 export default function AdminSettings() {
   const queryClient = useQueryClient();
@@ -18,6 +18,10 @@ export default function AdminSettings() {
 
   const [formData, setFormData] = useState<any>({});
 
+  // Credentials change state
+  const [creds, setCreds] = useState({ currentPassword: "", newUsername: "", newPassword: "", confirmPassword: "" });
+  const [credsLoading, setCredsLoading] = useState(false);
+
   useEffect(() => {
     if (settings) {
       setFormData(settings);
@@ -25,7 +29,7 @@ export default function AdminSettings() {
   }, [settings]);
 
   const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
@@ -41,6 +45,49 @@ export default function AdminSettings() {
     );
   };
 
+  const handleCredentialsChange = async () => {
+    if (!creds.currentPassword) {
+      toast.error("Current password is required");
+      return;
+    }
+    if (creds.newPassword && creds.newPassword.length < 6) {
+      toast.error("New password must be at least 6 characters");
+      return;
+    }
+    if (creds.newPassword && creds.newPassword !== creds.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    if (!creds.newUsername && !creds.newPassword) {
+      toast.error("Enter a new username or new password to update");
+      return;
+    }
+
+    setCredsLoading(true);
+    try {
+      const resp = await fetch("/api/auth/credentials", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: creds.currentPassword,
+          newUsername: creds.newUsername || undefined,
+          newPassword: creds.newPassword || undefined,
+        }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        toast.error(data.error || "Failed to update credentials");
+      } else {
+        toast.success("Credentials updated successfully");
+        setCreds({ currentPassword: "", newUsername: "", newPassword: "", confirmPassword: "" });
+      }
+    } catch {
+      toast.error("Network error");
+    } finally {
+      setCredsLoading(false);
+    }
+  };
+
   if (isLoading) return <AdminLayout><div className="animate-pulse h-96 bg-gray-100 rounded-xl"></div></AdminLayout>;
 
   return (
@@ -51,7 +98,7 @@ export default function AdminSettings() {
           <p className="text-gray-500 mt-1">Configure global platform options</p>
         </div>
         <Button onClick={handleSave} disabled={updateSettings.isPending}>
-          <Save className="w-4 h-4 mr-2" />
+          {updateSettings.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
           Save Settings
         </Button>
       </div>
@@ -127,6 +174,64 @@ export default function AdminSettings() {
               />
             </div>
           </div>
+
+          {/* Credentials Section */}
+          <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4">
+            <div className="flex items-center gap-2 border-b pb-2">
+              <KeyRound className="w-5 h-5 text-gray-600" />
+              <h3 className="font-bold text-lg">Admin Credentials</h3>
+            </div>
+            <p className="text-sm text-gray-500">Change your admin username or password. Current password is required to make any changes.</p>
+
+            <div className="space-y-2">
+              <Label>Current Password <span className="text-red-500">*</span></Label>
+              <Input
+                type="password"
+                value={creds.currentPassword}
+                onChange={e => setCreds(p => ({ ...p, currentPassword: e.target.value }))}
+                placeholder="Enter your current password"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">
+              <div className="space-y-2">
+                <Label>New Username</Label>
+                <Input
+                  value={creds.newUsername}
+                  onChange={e => setCreds(p => ({ ...p, newUsername: e.target.value }))}
+                  placeholder="Leave blank to keep current"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>New Password</Label>
+                <Input
+                  type="password"
+                  value={creds.newPassword}
+                  onChange={e => setCreds(p => ({ ...p, newPassword: e.target.value }))}
+                  placeholder="Min. 6 characters"
+                />
+              </div>
+              <div className="space-y-2 md:col-start-2">
+                <Label>Confirm New Password</Label>
+                <Input
+                  type="password"
+                  value={creds.confirmPassword}
+                  onChange={e => setCreds(p => ({ ...p, confirmPassword: e.target.value }))}
+                  placeholder="Repeat new password"
+                />
+              </div>
+            </div>
+
+            <Button
+              onClick={handleCredentialsChange}
+              disabled={credsLoading}
+              variant="outline"
+              className="w-full border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+            >
+              {credsLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <KeyRound className="w-4 h-4 mr-2" />}
+              Update Credentials
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -153,6 +258,11 @@ export default function AdminSettings() {
               </div>
               <Switch checked={formData.maintenanceMode} onCheckedChange={v => handleChange("maintenanceMode", v)} />
             </div>
+          </div>
+
+          <div className="bg-indigo-50 border border-indigo-100 p-5 rounded-xl">
+            <h4 className="font-semibold text-indigo-800 mb-2">Current Login Info</h4>
+            <p className="text-sm text-indigo-600">Your admin credentials are separate from the public user system. Keep them safe and change them regularly.</p>
           </div>
         </div>
       </div>

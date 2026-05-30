@@ -84,7 +84,6 @@ export function Footer() {
             <ul className="space-y-2">
               <li><Link href="#" className="text-muted-foreground hover:text-foreground">Privacy Policy</Link></li>
               <li><Link href="#" className="text-muted-foreground hover:text-foreground">Terms of Service</Link></li>
-              <li><Link href="/admin/login" className="text-muted-foreground hover:text-foreground">Admin</Link></li>
             </ul>
           </div>
         </div>
