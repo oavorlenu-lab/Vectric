@@ -9,6 +9,7 @@
 export * from './activityItem';
 export * from './adminSession';
 export * from './adSlot';
+export * from './adSlotCreate';
 export * from './adSlotUpdate';
 export * from './aiRequest';
 export * from './aiRequestAction';
@@ -26,6 +27,7 @@ export * from './getRecentPostsParams';
 export * from './getTopPostsParams';
 export * from './getTrendingPostsParams';
 export * from './healthStatus';
+export * from './listAdSlotsParams';
 export * from './listMediaParams';
 export * from './listMessagesParams';
 export * from './listPostsParams';

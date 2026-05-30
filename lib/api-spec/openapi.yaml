@@ -632,22 +632,48 @@ paths:
     get:
       operationId: listAdSlots
       tags: [ads]
-      summary: List all ad slots
+      summary: List ad blocks, optionally filtered by page/placement
+      parameters:
+        - name: pageType
+          in: query
+          required: false
+          schema: { type: string }
+        - name: placementType
+          in: query
+          required: false
+          schema: { type: string }
       responses:
         "200":
-          description: Ad slots
+          description: Ad blocks
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: "#/components/schemas/AdSlot"
+    post:
+      operationId: createAdSlot
+      tags: [ads]
+      summary: Create a new ad block
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdSlotCreate"
+      responses:
+        "201":
+          description: Created ad block
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdSlot"
 
   /ads/{id}:
     patch:
       operationId: updateAdSlot
       tags: [ads]
-      summary: Update ad slot script/enabled state
+      summary: Update an ad block
       parameters:
         - name: id
           in: path
@@ -661,11 +687,23 @@ paths:
               $ref: "#/components/schemas/AdSlotUpdate"
       responses:
         "200":
-          description: Updated slot
+          description: Updated ad block
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdSlot"
+    delete:
+      operationId: deleteAdSlot
+      tags: [ads]
+      summary: Delete an ad block
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
 
   # --- SETTINGS ---
   /settings:
@@ -1087,20 +1125,39 @@ components:
     # ADS
     AdSlot:
       type: object
-      required: [id, name, position, isEnabled]
+      required: [id, name, placementType, pageType, isEnabled, sortOrder]
       properties:
         id: { type: integer }
         name: { type: string }
-        position: { type: string }
+        placementType: { type: string }
+        pageType: { type: string }
         script: { type: ["string", "null"] }
         isEnabled: { type: boolean }
         description: { type: ["string", "null"] }
+        sortOrder: { type: integer }
+
+    AdSlotCreate:
+      type: object
+      required: [name, placementType, pageType]
+      properties:
+        name: { type: string }
+        placementType: { type: string }
+        pageType: { type: string }
+        script: { type: string }
+        isEnabled: { type: boolean }
+        description: { type: string }
+        sortOrder: { type: integer }
 
     AdSlotUpdate:
       type: object
       properties:
-        script: { type: string }
+        name: { type: string }
+        placementType: { type: string }
+        pageType: { type: string }
+        script: { type: ["string", "null"] }
         isEnabled: { type: boolean }
+        description: { type: ["string", "null"] }
+        sortOrder: { type: integer }
 
     # SETTINGS
     SiteSettings:

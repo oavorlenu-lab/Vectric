@@ -6,15 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface AdSlot {
-  id: number;
+export interface AdSlotCreate {
   name: string;
   placementType: string;
   pageType: string;
-  /** @nullable */
-  script?: string | null;
-  isEnabled: boolean;
-  /** @nullable */
-  description?: string | null;
-  sortOrder: number;
+  script?: string;
+  isEnabled?: boolean;
+  description?: string;
+  sortOrder?: number;
 }

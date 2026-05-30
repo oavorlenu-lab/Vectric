@@ -21,6 +21,7 @@ import type {
 
 import type {
   AdSlot,
+  AdSlotCreate,
   AdSlotUpdate,
   AdminSession,
   AiRequest,
@@ -38,6 +39,7 @@ import type {
   GetTopPostsParams,
   GetTrendingPostsParams,
   HealthStatus,
+  ListAdSlotsParams,
   ListMediaParams,
   ListMessagesParams,
   ListPostsParams,
@@ -2545,20 +2547,27 @@ export const useDeleteSubscriber = <TError = ErrorType<unknown>,
       return useMutation(getDeleteSubscriberMutationOptions(options));
     }
 
-export const getListAdSlotsUrl = () => {
+export const getListAdSlotsUrl = (params?: ListAdSlotsParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/ads`
+  return stringifiedParams.length > 0 ? `/api/ads?${stringifiedParams}` : `/api/ads`
 }
 
 /**
- * @summary List all ad slots
+ * @summary List ad blocks, optionally filtered by page/placement
  */
-export const listAdSlots = async ( options?: RequestInit): Promise<AdSlot[]> => {
+export const listAdSlots = async (params?: ListAdSlotsParams, options?: RequestInit): Promise<AdSlot[]> => {
 
-  return customFetch<AdSlot[]>(getListAdSlotsUrl(),
+  return customFetch<AdSlot[]>(getListAdSlotsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -2571,23 +2580,23 @@ export const listAdSlots = async ( options?: RequestInit): Promise<AdSlot[]> => 
 
 
 
-export const getListAdSlotsQueryKey = () => {
+export const getListAdSlotsQueryKey = (params?: ListAdSlotsParams,) => {
     return [
-    `/api/ads`
+    `/api/ads`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getListAdSlotsQueryOptions = <TData = Awaited<ReturnType<typeof listAdSlots>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdSlots>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getListAdSlotsQueryOptions = <TData = Awaited<ReturnType<typeof listAdSlots>>, TError = ErrorType<unknown>>(params?: ListAdSlotsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdSlots>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListAdSlotsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListAdSlotsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdSlots>>> = ({ signal }) => listAdSlots({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdSlots>>> = ({ signal }) => listAdSlots(params, { signal, ...requestOptions });
 
 
 
@@ -2601,15 +2610,15 @@ export type ListAdSlotsQueryError = ErrorType<unknown>
 
 
 /**
- * @summary List all ad slots
+ * @summary List ad blocks, optionally filtered by page/placement
  */
 
 export function useListAdSlots<TData = Awaited<ReturnType<typeof listAdSlots>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdSlots>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ params?: ListAdSlotsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdSlots>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getListAdSlotsQueryOptions(options)
+  const queryOptions = getListAdSlotsQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -2622,6 +2631,77 @@ export function useListAdSlots<TData = Awaited<ReturnType<typeof listAdSlots>>, 
 
 
 
+export const getCreateAdSlotUrl = () => {
+
+
+
+
+  return `/api/ads`
+}
+
+/**
+ * @summary Create a new ad block
+ */
+export const createAdSlot = async (adSlotCreate: AdSlotCreate, options?: RequestInit): Promise<AdSlot> => {
+
+  return customFetch<AdSlot>(getCreateAdSlotUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adSlotCreate,)
+  }
+);}
+
+
+
+
+export const getCreateAdSlotMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdSlot>>, TError,{data: BodyType<AdSlotCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdSlot>>, TError,{data: BodyType<AdSlotCreate>}, TContext> => {
+
+const mutationKey = ['createAdSlot'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdSlot>>, {data: BodyType<AdSlotCreate>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdSlot(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdSlotMutationResult = NonNullable<Awaited<ReturnType<typeof createAdSlot>>>
+    export type CreateAdSlotMutationBody = BodyType<AdSlotCreate>
+    export type CreateAdSlotMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create a new ad block
+ */
+export const useCreateAdSlot = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdSlot>>, TError,{data: BodyType<AdSlotCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdSlot>>,
+        TError,
+        {data: BodyType<AdSlotCreate>},
+        TContext
+      > => {
+      return useMutation(getCreateAdSlotMutationOptions(options));
+    }
+
 export const getUpdateAdSlotUrl = (id: number,) => {
 
 
@@ -2631,7 +2711,7 @@ export const getUpdateAdSlotUrl = (id: number,) => {
 }
 
 /**
- * @summary Update ad slot script/enabled state
+ * @summary Update an ad block
  */
 export const updateAdSlot = async (id: number,
     adSlotUpdate: AdSlotUpdate, options?: RequestInit): Promise<AdSlot> => {
@@ -2681,7 +2761,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type UpdateAdSlotMutationError = ErrorType<unknown>
 
     /**
- * @summary Update ad slot script/enabled state
+ * @summary Update an ad block
  */
 export const useUpdateAdSlot = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdSlot>>, TError,{id: number;data: BodyType<AdSlotUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -2692,6 +2772,76 @@ export const useUpdateAdSlot = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getUpdateAdSlotMutationOptions(options));
+    }
+
+export const getDeleteAdSlotUrl = (id: number,) => {
+
+
+
+
+  return `/api/ads/${id}`
+}
+
+/**
+ * @summary Delete an ad block
+ */
+export const deleteAdSlot = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteAdSlotUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteAdSlotMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdSlot>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdSlot>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteAdSlot'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdSlot>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteAdSlot(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdSlotMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdSlot>>>
+
+    export type DeleteAdSlotMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete an ad block
+ */
+export const useDeleteAdSlot = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdSlot>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdSlot>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAdSlotMutationOptions(options));
     }
 
 export const getGetSettingsUrl = () => {

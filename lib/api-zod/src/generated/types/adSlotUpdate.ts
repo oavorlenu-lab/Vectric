@@ -7,6 +7,13 @@
  */
 
 export interface AdSlotUpdate {
-  script?: string;
+  name?: string;
+  placementType?: string;
+  pageType?: string;
+  /** @nullable */
+  script?: string | null;
   isEnabled?: boolean;
+  /** @nullable */
+  description?: string | null;
+  sortOrder?: number;
 }

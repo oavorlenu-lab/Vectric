@@ -279,17 +279,36 @@ export interface NewsletterInput {
 export interface AdSlot {
   id: number;
   name: string;
-  position: string;
+  placementType: string;
+  pageType: string;
   /** @nullable */
   script?: string | null;
   isEnabled: boolean;
   /** @nullable */
   description?: string | null;
+  sortOrder: number;
+}
+
+export interface AdSlotCreate {
+  name: string;
+  placementType: string;
+  pageType: string;
+  script?: string;
+  isEnabled?: boolean;
+  description?: string;
+  sortOrder?: number;
 }
 
 export interface AdSlotUpdate {
-  script?: string;
+  name?: string;
+  placementType?: string;
+  pageType?: string;
+  /** @nullable */
+  script?: string | null;
   isEnabled?: boolean;
+  /** @nullable */
+  description?: string | null;
+  sortOrder?: number;
 }
 
 export interface SiteSettings {
@@ -450,6 +469,11 @@ limit?: number;
 
 export type ListMessagesParams = {
 read?: boolean;
+};
+
+export type ListAdSlotsParams = {
+pageType?: string;
+placementType?: string;
 };
 
 export type GetTopPostsParams = {
