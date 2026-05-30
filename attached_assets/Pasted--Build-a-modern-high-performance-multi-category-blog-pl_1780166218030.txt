@@ -1,0 +1,636 @@
+
+
+Build a modern, high-performance multi-category blog platform named Vectric.
+
+It is NOT a news site. It is a blog publishing platform covering multiple topics like:
+
+Sports blogs
+
+Technology blogs
+
+Business blogs
+
+Health blogs
+
+Travel blogs
+
+Entertainment blogs
+
+Lifestyle blogs
+
+Science blogs
+
+
+The platform must look like a premium global publishing brand.
+
+Primary goals:
+
+High Google SEO rankings
+
+High traffic from search engines
+
+Strong AdSense monetization
+
+Fast performance (Core Web Vitals optimized)
+
+Easy admin management (no coding after setup)
+
+AI-assisted blog creation
+
+Secure system
+
+
+
+---
+
+2. Public Website Requirements
+
+Design Style
+
+Clean, premium magazine-style layout
+
+High readability typography
+
+Mobile-first responsive design
+
+Fast loading
+
+Large image-driven blog cards
+
+Minimal clutter
+
+Professional spacing system
+
+
+
+---
+
+Homepage Structure
+
+Include:
+
+Hero featured blog section
+
+Trending blogs section
+
+Latest blogs grid
+
+Category sections (Sports, Tech, etc.)
+
+Popular posts section
+
+Newsletter signup section
+
+Footer with navigation links
+
+
+Each section must be editable from admin.
+
+
+---
+
+Blog System (Core)
+
+Each blog post must include:
+
+SEO-friendly URL slug
+
+Title
+
+Featured image (uploaded from device)
+
+Category
+
+Tags
+
+Author name
+
+Reading time
+
+Full rich text content
+
+Internal linking support
+
+External links support (with button-style embed option)
+
+Optional cover button (CTA button inside blog content)
+
+Related blogs section
+
+
+Blogs must be fully indexable by Google.
+
+
+---
+
+Blog Page Layout
+
+Each blog page includes:
+
+Featured image at top
+
+Title + metadata
+
+Table of contents (auto-generated for long content)
+
+Main content
+
+CTA button blocks (for links)
+
+Related posts
+
+Social share buttons
+
+
+
+---
+
+3. Navigation System
+
+Header menu (editable)
+
+Footer menu (editable)
+
+Category dropdown menu
+
+Search bar (global search)
+
+
+IMPORTANT:
+
+When any page is clicked or loaded, it must automatically scroll to the top.
+
+
+---
+
+4. Admin Panel (CRITICAL)
+
+Admin panel path:
+
+/admin
+
+Admin Requirements
+
+Fully responsive (mobile + desktop)
+
+Password protected login
+
+No email verification required
+
+Secure session authentication
+
+Logout system
+
+
+
+---
+
+Admin Dashboard Features
+
+Total blogs count
+
+Categories overview
+
+Traffic overview (basic analytics support)
+
+Recent activity log
+
+Messages inbox
+
+Newsletter subscribers list
+
+Ad performance overview (manual tracking support)
+
+
+
+---
+
+5. Blog Management System
+
+Admin must be able to:
+
+Create blog posts
+
+Edit blog posts
+
+Delete blog posts
+
+Schedule posts
+
+Save drafts
+
+Publish/unpublish instantly
+
+
+Editor Features
+
+Rich text editor (like Notion / Medium style)
+
+Add images (upload from device ONLY)
+
+Add headings, lists, quotes
+
+Add links with button-style formatting
+
+Embed external content
+
+SEO settings per blog
+
+
+
+---
+
+6. Image System (IMPORTANT)
+
+No image URLs allowed.
+
+Must include:
+
+Upload from device
+
+Drag & drop upload
+
+Media library
+
+Image reuse system
+
+Image compression automatically
+
+Featured image selection
+
+Category images support
+
+Logo + favicon upload
+
+
+
+---
+
+7. Categories System
+
+Admin must be able to:
+
+Create categories
+
+Rename categories
+
+Delete categories
+
+Reorder categories
+
+Assign images to categories
+
+
+
+---
+
+8. Advertisement System (AdSense Ready)
+
+Ads must be integrated cleanly without harming user experience.
+
+Ad Manager in Admin
+
+Admin can paste AdSense or ad scripts into:
+
+Homepage ad slots
+
+Sidebar ad slots
+
+In-article ad slots
+
+End-of-article ads
+
+Mobile sticky ad slot (optional)
+
+
+Ad Positions
+
+Homepage:
+
+Below hero section
+
+Between content sections
+
+Above footer
+
+
+Blog page:
+
+After intro paragraph
+
+Mid-content
+
+Before related posts
+
+End of article
+
+Sidebar (desktop only)
+
+
+Ads must look like part of layout, not intrusive.
+
+Admin can enable/disable each slot.
+
+
+---
+
+9. SEO Requirements (VERY IMPORTANT)
+
+Every blog must be fully SEO optimized:
+
+Editable SEO title
+
+Editable meta description
+
+Keywords support
+
+Clean URL slugs
+
+Canonical URLs
+
+Open Graph tags
+
+Twitter card support
+
+Structured data (BlogPosting schema)
+
+Auto sitemap generation
+
+Robots.txt generation
+
+
+
+---
+
+Google Requirements
+
+Must support:
+
+Google Search Console verification
+
+Google Analytics integration
+
+Indexable pages by default
+
+
+
+---
+
+10. AI Writing System (Grok API)
+
+Admin can connect AI using API key.
+
+AI Features:
+
+Generate blog posts from topic
+
+Expand blog drafts
+
+Rewrite content
+
+Summarize blogs
+
+Generate SEO titles
+
+Generate meta descriptions
+
+Suggest tags
+
+Suggest internal links
+
+
+AI-generated content must always be editable before publishing.
+
+
+---
+
+11. Contact + Messaging System
+
+Include contact page:
+
+Fields:
+
+Name
+
+Email
+
+Message
+
+
+Messages must appear in admin inbox.
+
+Admin can:
+
+View messages
+
+Delete messages
+
+Mark as read
+
+
+
+---
+
+12. Email System (IMPORTANT)
+
+Admin must be able to email:
+
+All registered users
+
+Selected users
+
+Newsletter subscribers
+
+
+Features:
+
+Email editor
+
+Subject line
+
+Send immediately or schedule
+
+
+
+---
+
+13. User System
+
+User signup is OPTIONAL.
+
+If enabled:
+
+Users can register
+
+Login/logout system
+
+Newsletter subscription system
+
+
+Users are NOT required to access content.
+
+
+---
+
+14. Performance Requirements
+
+Very fast page load
+
+Optimized images
+
+Lazy loading
+
+Mobile-first optimization
+
+Core Web Vitals optimized
+
+Clean code structure
+
+
+
+---
+
+15. Security Requirements
+
+Strong password hashing
+
+Secure sessions
+
+Brute force protection
+
+Rate limiting
+
+Input validation
+
+XSS protection
+
+CSRF protection
+
+Secure file uploads
+
+Secure admin area only
+
+API key stored securely in environment variables
+
+
+
+---
+
+16. Environment Variables (.env REQUIRED)
+
+All credentials must be stored in .env.
+
+Include:
+
+DATABASE_URL
+
+SESSION_SECRET
+
+GROK_API_KEY
+
+EMAIL_SERVICE_KEY (if used)
+
+ANALYTICS_ID
+
+ADSENSE_CLIENT_ID
+
+
+No secrets should be hardcoded.
+
+
+---
+
+17. Database System
+
+Default system:
+
+Use built-in database system initially (simple default setup)
+
+
+Must also provide:
+
+Supabase Migration Guide
+
+Provide a clear, beginner-friendly guide explaining:
+
+How to create Supabase account
+
+How to create a project
+
+How to copy database URL
+
+How to replace DATABASE_URL in .env
+
+How to migrate data safely
+
+
+The system must support switching database without changing application logic.
+
+
+---
+
+18. External Links + CTA Buttons
+
+Inside blogs:
+
+Allow hyperlink insertion
+
+Allow “button-style links” (Call To Action blocks)
+
+Buttons should be customizable:
+
+Text
+
+URL
+
+Style
+
+
+
+Example use cases:
+
+“Read more”
+
+“Visit source”
+
+“Buy now”
+
+“Learn more”
+
+
+
+---
+
+19. Technical Constraint
+
+No manual coding required after deployment
+
+Everything manageable via admin panel
+
+Fully production-ready system
+
+Scalable architecture for large content growth
+
+
+
+---
+
+20. Final Goal
+
+Vectric must behave like a premium global blogging platform that:
+
+Ranks on Google through SEO
+
+Publishes high-quality blogs easily
+
+Monetizes through AdSense efficiently
+
+Requires zero coding after setup
+
+Is fully controlled through a secure admin panel
+
+Supports AI-assisted writing workflow
+
+Works fast on all devices
+
+
