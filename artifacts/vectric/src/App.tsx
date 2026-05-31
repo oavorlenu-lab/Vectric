@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { CookieBanner } from "@/components/CookieBanner";
 
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
@@ -80,6 +81,7 @@ function App() {
           <Router />
         </WouterRouter>
         <Toaster position="top-center" />
+        <CookieBanner />
       </TooltipProvider>
     </QueryClientProvider>
   );
