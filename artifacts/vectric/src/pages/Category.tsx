@@ -3,13 +3,14 @@ import { Link } from "wouter";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { useListPosts, useGetCategoriesWithCounts } from "@workspace/api-client-react";
 import { formatDate } from "@/lib/format";
+import { AdSlot } from "@/components/AdSlot";
 
 export default function Category() {
   const { slug } = useParams();
-  
+
   const { data: categories } = useGetCategoriesWithCounts();
   const category = categories?.find(c => c.slug === slug);
-  
+
   const { data: results, isLoading } = useListPosts(
     { category: slug, limit: 20 },
     { query: { enabled: !!slug } }
@@ -19,14 +20,20 @@ export default function Category() {
     <PublicLayout>
       <div className="bg-muted border-b">
         <div className="container mx-auto px-4 py-16 max-w-4xl text-center">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 capitalize">{category?.name || slug?.replace(/-/g, ' ')}</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 capitalize">
+            {category?.name || slug?.replace(/-/g, " ")}
+          </h1>
           {category?.description && (
             <p className="text-xl text-muted-foreground">{category.description}</p>
           )}
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 max-w-5xl">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <AdSlot position="category_top" />
+      </div>
+
+      <div className="container mx-auto px-4 py-12 max-w-5xl">
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {[1, 2, 3, 4].map(i => (
@@ -40,14 +47,14 @@ export default function Category() {
           </div>
         ) : results?.posts && results.posts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16">
-            {results.posts.map((post, i) => (
+            {results.posts.map((post) => (
               <div key={post.id} className="group">
                 {post.featuredImageUrl && (
                   <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-muted relative mb-6">
-                    <Link href={`/blog/${post.slug}`} className="absolute inset-0 z-10"></Link>
-                    <img 
-                      src={post.featuredImageUrl} 
-                      alt={post.title} 
+                    <Link href={`/blog/${post.slug}`} className="absolute inset-0 z-10" />
+                    <img
+                      src={post.featuredImageUrl}
+                      alt={post.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
@@ -68,7 +75,9 @@ export default function Category() {
           </div>
         ) : (
           <div className="text-center py-20">
-            <h2 className="text-2xl font-serif font-medium text-muted-foreground">No posts found in this category</h2>
+            <h2 className="text-2xl font-serif font-medium text-muted-foreground">
+              No posts found in this category
+            </h2>
           </div>
         )}
       </div>
