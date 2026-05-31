@@ -146,10 +146,12 @@ router.get("/sitemap.xml", async (_req, res): Promise<void> => {
     .select({ slug: categoriesTable.slug })
     .from(categoriesTable);
 
-  // Determine the host from environment or fallback
-  const host = process.env.REPLIT_DOMAINS?.split(",")[0]
+  // Determine the host — SITE_URL takes priority (set this to your custom domain)
+  const host = process.env.SITE_URL
+    ? process.env.SITE_URL.replace(/\/+$/, "")
+    : process.env.REPLIT_DOMAINS?.split(",")[0]
     ? `https://${process.env.REPLIT_DOMAINS.split(",")[0]}`
-    : "https://vectric.replit.app";
+    : "https://yourdomain.com";
 
   const toDate = (d: Date) => d.toISOString().split("T")[0];
 
@@ -193,6 +195,18 @@ ${postEntries}
   res.setHeader("Content-Type", "application/xml");
   res.setHeader("Cache-Control", "public, max-age=3600");
   res.send(xml);
+});
+
+router.get("/robots.txt", (_req, res): void => {
+  const host = process.env.SITE_URL
+    ? process.env.SITE_URL.replace(/\/+$/, "")
+    : process.env.REPLIT_DOMAINS?.split(",")[0]
+    ? `https://${process.env.REPLIT_DOMAINS.split(",")[0]}`
+    : "https://yourdomain.com";
+
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Cache-Control", "public, max-age=86400");
+  res.send(`User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: ${host}/api/sitemap.xml\n`);
 });
 
 router.get("/posts/trending", async (req, res): Promise<void> => {

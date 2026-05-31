@@ -63,6 +63,22 @@ export default defineConfig({
     fs: {
       strict: true,
     },
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/sitemap.xml": {
+        target: "http://localhost:8080/api/sitemap.xml",
+        changeOrigin: true,
+        rewrite: () => "/api/sitemap.xml",
+      },
+      "/robots.txt": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: () => "/api/robots.txt",
+      },
+    },
   },
   preview: {
     port,
