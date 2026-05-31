@@ -276,6 +276,18 @@ export interface NewsletterInput {
   email: string;
 }
 
+export interface NewsletterSendInput {
+  subject: string;
+  html: string;
+  fromName?: string;
+}
+
+export interface NewsletterSendResult {
+  sent: number;
+  failed: number;
+  message?: string;
+}
+
 export interface AdSlot {
   id: number;
   name: string;
@@ -322,6 +334,8 @@ export interface SiteSettings {
   footerMenu?: string | null;
   /** @nullable */
   contactEmail?: string | null;
+  /** @nullable */
+  resendApiKey?: string | null;
   enableUserRegistration?: boolean;
   maintenanceMode?: boolean;
   updatedAt?: string;
@@ -342,6 +356,7 @@ export interface SiteSettingsUpdate {
   headerMenu?: string;
   footerMenu?: string;
   contactEmail?: string;
+  resendApiKey?: string;
   enableUserRegistration?: boolean;
   maintenanceMode?: boolean;
 }

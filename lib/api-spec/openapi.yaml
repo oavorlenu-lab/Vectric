@@ -598,6 +598,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/NewsletterSubscriber"
 
+  /newsletter/send:
+    post:
+      operationId: sendNewsletter
+      tags: [newsletter]
+      summary: Send newsletter email to all subscribers (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsletterSendInput"
+      responses:
+        "200":
+          description: Send result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsletterSendResult"
+        "400":
+          description: Bad request
+        "500":
+          description: Error sending
+
   /newsletter/subscribers:
     get:
       operationId: listSubscribers
@@ -1069,6 +1092,22 @@ components:
         isRead: { type: boolean }
 
     # NEWSLETTER
+    NewsletterSendInput:
+      type: object
+      required: [subject, html]
+      properties:
+        subject: { type: string, minLength: 1 }
+        html: { type: string, minLength: 1 }
+        fromName: { type: string }
+
+    NewsletterSendResult:
+      type: object
+      required: [sent, failed]
+      properties:
+        sent: { type: integer }
+        failed: { type: integer }
+        message: { type: string }
+
     NewsletterSubscriber:
       type: object
       required: [id, email, createdAt]
@@ -1122,6 +1161,7 @@ components:
         headerMenu: { type: ["string", "null"] }
         footerMenu: { type: ["string", "null"] }
         contactEmail: { type: ["string", "null"] }
+        resendApiKey: { type: ["string", "null"] }
         enableUserRegistration: { type: boolean }
         maintenanceMode: { type: boolean }
         updatedAt: { type: string }
@@ -1143,6 +1183,7 @@ components:
         headerMenu: { type: string }
         footerMenu: { type: string }
         contactEmail: { type: string }
+        resendApiKey: { type: string }
         enableUserRegistration: { type: boolean }
         maintenanceMode: { type: boolean }
 

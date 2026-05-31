@@ -156,6 +156,19 @@ export default function AdminSettings() {
           </div>
 
           <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4">
+            <h3 className="font-bold border-b pb-2 text-lg">Email (Newsletter)</h3>
+            <div className="space-y-2">
+              <Label>Resend API Key</Label>
+              <Input type="password" value={formData.resendApiKey || ""} onChange={e => handleChange("resendApiKey", e.target.value)} placeholder="re_..." />
+              <p className="text-xs text-gray-500">
+                Required to send newsletters to your subscribers. Get a free key at{" "}
+                <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="underline text-blue-600">resend.com</a>
+                {" "}— free tier includes 3,000 emails/month and requires no credit card.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4">
             <h3 className="font-bold border-b pb-2 text-lg">Footer & Navigation</h3>
             
             <div className="space-y-2">

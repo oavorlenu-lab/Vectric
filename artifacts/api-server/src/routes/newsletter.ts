@@ -1,8 +1,9 @@
 import { Router, type IRouter } from "express";
-import { db, newsletterSubscribersTable } from "@workspace/db";
+import { db, newsletterSubscribersTable, siteSettingsTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
-import { SubscribeNewsletterBody, DeleteSubscriberParams } from "@workspace/api-zod";
+import { SubscribeNewsletterBody, DeleteSubscriberParams, SendNewsletterBody } from "@workspace/api-zod";
 import { requireAdmin } from "../middlewares/auth";
+import { Resend } from "resend";
 
 const router: IRouter = Router();
 
@@ -16,10 +17,58 @@ router.post("/newsletter/subscribe", async (req, res): Promise<void> => {
     const [sub] = await db.insert(newsletterSubscribersTable).values(parsed.data).returning();
     res.status(201).json({ ...sub, createdAt: sub.createdAt.toISOString() });
   } catch {
-    // unique constraint violation — already subscribed
     const [existing] = await db.select().from(newsletterSubscribersTable).where(eq(newsletterSubscribersTable.email, parsed.data.email));
     res.status(200).json({ ...existing, createdAt: existing.createdAt.toISOString() });
   }
+});
+
+router.post("/newsletter/send", requireAdmin, async (req, res): Promise<void> => {
+  const parsed = SendNewsletterBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const [settings] = await db.select().from(siteSettingsTable);
+  const apiKey = settings?.resendApiKey;
+
+  if (!apiKey) {
+    res.status(400).json({ error: "Resend API key not configured. Add it in Admin → Settings → Email." });
+    return;
+  }
+
+  const subscribers = await db.select().from(newsletterSubscribersTable).orderBy(desc(newsletterSubscribersTable.createdAt));
+
+  if (subscribers.length === 0) {
+    res.json({ sent: 0, failed: 0, message: "No subscribers to send to." });
+    return;
+  }
+
+  const resend = new Resend(apiKey);
+  const siteName = settings?.siteName || "Newsletter";
+  const fromName = parsed.data.fromName || siteName;
+  const fromEmail = `newsletter@resend.dev`;
+  const contactEmail = settings?.contactEmail;
+
+  let sent = 0;
+  let failed = 0;
+
+  for (const sub of subscribers) {
+    try {
+      await resend.emails.send({
+        from: `${fromName} <${fromEmail}>`,
+        to: sub.email,
+        subject: parsed.data.subject,
+        html: parsed.data.html,
+        ...(contactEmail ? { replyTo: contactEmail } : {}),
+      });
+      sent++;
+    } catch {
+      failed++;
+    }
+  }
+
+  res.json({ sent, failed, message: `Sent to ${sent} subscriber${sent !== 1 ? "s" : ""}${failed > 0 ? `, ${failed} failed` : ""}.` });
 });
 
 router.get("/newsletter/subscribers", requireAdmin, async (_req, res): Promise<void> => {

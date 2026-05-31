@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
-import { useGetPost, useCreatePost, useUpdatePost, useListCategories } from "@workspace/api-client-react";
+import { useGetPost, useCreatePost, useUpdatePost, useListCategories, useSendNewsletter, useGetSettings } from "@workspace/api-client-react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,11 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
   Bold, Italic, Underline, Heading2, Heading3, List, ListOrdered,
   Quote, Link as LinkIcon, Image as ImageIcon, Save, ArrowLeft,
-  Upload, X, Loader2
+  Upload, X, Loader2, Send
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListPostsQueryKey, getGetPostQueryKey } from "@workspace/api-client-react";
@@ -28,9 +29,15 @@ export default function AdminPostEditor() {
   });
 
   const { data: categories } = useListCategories();
+  const { data: settings } = useGetSettings();
 
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
+  const sendNewsletter = useSendNewsletter();
+
+  const [newsletterOpen, setNewsletterOpen] = useState(false);
+  const [nlSubject, setNlSubject] = useState("");
+  const [nlFromName, setNlFromName] = useState("");
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -194,6 +201,41 @@ export default function AdminPostEditor() {
     }
   };
 
+  const handleOpenNewsletter = () => {
+    setNlSubject(title ? `New post: ${title}` : "");
+    setNlFromName(settings?.siteName || "");
+    setNewsletterOpen(true);
+  };
+
+  const handleSendNewsletter = () => {
+    if (!nlSubject.trim()) {
+      toast.error("Subject is required");
+      return;
+    }
+    const postUrl = `${window.location.origin}/blog/${slug}`;
+    const html = `
+      <h1>${title}</h1>
+      ${excerpt ? `<p><em>${excerpt}</em></p>` : ""}
+      <p>${content.replace(/<[^>]*>/g, " ").substring(0, 300)}…</p>
+      <p><a href="${postUrl}" style="display:inline-block;background:#000;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-weight:600;">Read full article</a></p>
+      <hr/>
+      <p style="color:#888;font-size:12px;">You're receiving this because you subscribed to ${settings?.siteName || "our newsletter"}.</p>
+    `;
+    sendNewsletter.mutate(
+      { data: { subject: nlSubject, html, fromName: nlFromName || undefined } },
+      {
+        onSuccess: (result) => {
+          toast.success(result.message || `Sent to ${result.sent} subscribers`);
+          setNewsletterOpen(false);
+        },
+        onError: (err: any) => {
+          const msg = err?.response?.data?.error || "Failed to send newsletter";
+          toast.error(msg);
+        }
+      }
+    );
+  };
+
   if (isEdit && postLoading) return <AdminLayout><div className="animate-pulse h-96 bg-gray-100 rounded-xl" /></AdminLayout>;
 
   return (
@@ -207,13 +249,61 @@ export default function AdminPostEditor() {
             {isEdit ? "Edit Post" : "New Post"}
           </h1>
         </div>
-        <Button onClick={handleSave} disabled={createPost.isPending || updatePost.isPending}>
-          {(createPost.isPending || updatePost.isPending)
-            ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            : <Save className="w-4 h-4 mr-2" />}
-          Save Post
-        </Button>
+        <div className="flex items-center gap-2">
+          {isEdit && (
+            <Button variant="outline" onClick={handleOpenNewsletter} title="Send this post as a newsletter to all subscribers">
+              <Send className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Send Newsletter</span>
+            </Button>
+          )}
+          <Button onClick={handleSave} disabled={createPost.isPending || updatePost.isPending}>
+            {(createPost.isPending || updatePost.isPending)
+              ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              : <Save className="w-4 h-4 mr-2" />}
+            Save Post
+          </Button>
+        </div>
       </div>
+
+      <Dialog open={newsletterOpen} onOpenChange={setNewsletterOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send as Newsletter</DialogTitle>
+            <DialogDescription>
+              An email with a link to this post will be sent to all your subscribers.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <div>
+              <Label>From Name</Label>
+              <Input
+                value={nlFromName}
+                onChange={e => setNlFromName(e.target.value)}
+                placeholder={settings?.siteName || "Your site name"}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Subject <span className="text-red-500">*</span></Label>
+              <Input
+                value={nlSubject}
+                onChange={e => setNlSubject(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              The email will include the post title, excerpt, a short preview, and a "Read full article" button.
+            </p>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setNewsletterOpen(false)}>Cancel</Button>
+              <Button onClick={handleSendNewsletter} disabled={sendNewsletter.isPending}>
+                {sendNewsletter.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+                Send
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-20">
         {/* Main editor */}

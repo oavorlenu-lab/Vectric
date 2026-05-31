@@ -573,6 +573,22 @@ export const DeleteMessageParams = zod.object({
 
 
 /**
+ * @summary Send newsletter email to all subscribers (admin)
+ */
+export const SendNewsletterBody = zod.object({
+  "subject": zod.string().min(1),
+  "html": zod.string().min(1),
+  "fromName": zod.string().optional()
+})
+
+export const SendNewsletterResponse = zod.object({
+  "sent": zod.number(),
+  "failed": zod.number(),
+  "message": zod.string().optional()
+})
+
+
+/**
  * @summary Subscribe to newsletter (public)
  */
 export const SubscribeNewsletterBody = zod.object({
@@ -655,6 +671,7 @@ export const GetSettingsResponse = zod.object({
   "headerMenu": zod.string().nullish(),
   "footerMenu": zod.string().nullish(),
   "contactEmail": zod.string().nullish(),
+  "resendApiKey": zod.string().nullish(),
   "enableUserRegistration": zod.boolean().optional(),
   "maintenanceMode": zod.boolean().optional(),
   "updatedAt": zod.string().optional()
@@ -679,6 +696,7 @@ export const UpdateSettingsBody = zod.object({
   "headerMenu": zod.string().optional(),
   "footerMenu": zod.string().optional(),
   "contactEmail": zod.string().optional(),
+  "resendApiKey": zod.string().optional(),
   "enableUserRegistration": zod.boolean().optional(),
   "maintenanceMode": zod.boolean().optional()
 })
@@ -699,6 +717,7 @@ export const UpdateSettingsResponse = zod.object({
   "headerMenu": zod.string().nullish(),
   "footerMenu": zod.string().nullish(),
   "contactEmail": zod.string().nullish(),
+  "resendApiKey": zod.string().nullish(),
   "enableUserRegistration": zod.boolean().optional(),
   "maintenanceMode": zod.boolean().optional(),
   "updatedAt": zod.string().optional()

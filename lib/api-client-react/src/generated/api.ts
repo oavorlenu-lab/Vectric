@@ -47,6 +47,8 @@ import type {
   MediaUpload,
   MessageUpdate,
   NewsletterInput,
+  NewsletterSendInput,
+  NewsletterSendResult,
   NewsletterSubscriber,
   Post,
   PostInput,
@@ -2325,6 +2327,59 @@ export const useDeleteMessage = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getDeleteMessageMutationOptions(options));
+    }
+
+export const getSendNewsletterUrl = () => {
+  return `/api/newsletter/send`
+}
+
+/**
+ * @summary Send newsletter email to all subscribers (admin)
+ */
+export const sendNewsletter = async (newsletterSendInput: NewsletterSendInput, options?: RequestInit): Promise<NewsletterSendResult> => {
+  return customFetch<NewsletterSendResult>(getSendNewsletterUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(newsletterSendInput)
+  }
+);}
+
+export const getSendNewsletterMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendNewsletter>>, TError,{data: BodyType<NewsletterSendInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendNewsletter>>, TError,{data: BodyType<NewsletterSendInput>}, TContext> => {
+
+const mutationKey = ['sendNewsletter'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendNewsletter>>, {data: BodyType<NewsletterSendInput>}> = (props) => {
+          const {data} = props ?? {};
+          return sendNewsletter(data, requestOptions)
+        }
+
+  return { mutationFn, ...mutationOptions }}
+
+    export type SendNewsletterMutationResult = NonNullable<Awaited<ReturnType<typeof sendNewsletter>>>
+    export type SendNewsletterMutationBody = BodyType<NewsletterSendInput>
+    export type SendNewsletterMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Send newsletter email to all subscribers (admin)
+ */
+export const useSendNewsletter = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendNewsletter>>, TError,{data: BodyType<NewsletterSendInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof sendNewsletter>>,
+        TError,
+        {data: BodyType<NewsletterSendInput>},
+        TContext
+      > => {
+      return useMutation(getSendNewsletterMutationOptions(options));
     }
 
 export const getSubscribeNewsletterUrl = () => {
