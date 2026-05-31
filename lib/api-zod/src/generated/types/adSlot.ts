@@ -9,12 +9,10 @@
 export interface AdSlot {
   id: number;
   name: string;
-  placementType: string;
-  pageType: string;
+  position: string;
   /** @nullable */
   script?: string | null;
   isEnabled: boolean;
   /** @nullable */
   description?: string | null;
-  sortOrder: number;
 }

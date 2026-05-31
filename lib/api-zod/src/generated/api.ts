@@ -601,74 +601,38 @@ export const DeleteSubscriberParams = zod.object({
 
 
 /**
- * @summary List ad blocks, optionally filtered by page/placement
+ * @summary List all ad slots
  */
-export const ListAdSlotsQueryParams = zod.object({
-  "pageType": zod.coerce.string().optional(),
-  "placementType": zod.coerce.string().optional()
-})
-
 export const ListAdSlotsResponseItem = zod.object({
   "id": zod.number(),
   "name": zod.string(),
-  "placementType": zod.string(),
-  "pageType": zod.string(),
+  "position": zod.string(),
   "script": zod.string().nullish(),
   "isEnabled": zod.boolean(),
-  "description": zod.string().nullish(),
-  "sortOrder": zod.number()
+  "description": zod.string().nullish()
 })
 export const ListAdSlotsResponse = zod.array(ListAdSlotsResponseItem)
 
 
 /**
- * @summary Create a new ad block
- */
-export const CreateAdSlotBody = zod.object({
-  "name": zod.string(),
-  "placementType": zod.string(),
-  "pageType": zod.string(),
-  "script": zod.string().optional(),
-  "isEnabled": zod.boolean().optional(),
-  "description": zod.string().optional(),
-  "sortOrder": zod.number().optional()
-})
-
-
-/**
- * @summary Update an ad block
+ * @summary Update ad slot script/enabled state
  */
 export const UpdateAdSlotParams = zod.object({
   "id": zod.coerce.number()
 })
 
 export const UpdateAdSlotBody = zod.object({
-  "name": zod.string().optional(),
-  "placementType": zod.string().optional(),
-  "pageType": zod.string().optional(),
-  "script": zod.string().nullish(),
-  "isEnabled": zod.boolean().optional(),
-  "description": zod.string().nullish(),
-  "sortOrder": zod.number().optional()
+  "script": zod.string().optional(),
+  "isEnabled": zod.boolean().optional()
 })
 
 export const UpdateAdSlotResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
-  "placementType": zod.string(),
-  "pageType": zod.string(),
+  "position": zod.string(),
   "script": zod.string().nullish(),
   "isEnabled": zod.boolean(),
-  "description": zod.string().nullish(),
-  "sortOrder": zod.number()
-})
-
-
-/**
- * @summary Delete an ad block
- */
-export const DeleteAdSlotParams = zod.object({
-  "id": zod.coerce.number()
+  "description": zod.string().nullish()
 })
 
 
