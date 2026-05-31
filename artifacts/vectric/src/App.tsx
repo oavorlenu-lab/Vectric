@@ -12,6 +12,8 @@ import Search from "@/pages/Search";
 import Contact from "@/pages/Contact";
 import About from "@/pages/About";
 import Login from "@/pages/Login";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
 
 import AdminLogin from "@/pages/admin/AdminLogin";
 import Dashboard from "@/pages/admin/Dashboard";
@@ -47,6 +49,8 @@ function Router() {
         <Route path="/contact" component={Contact} />
         <Route path="/about" component={About} />
         <Route path="/login" component={Login} />
+        <Route path="/privacy-policy" component={PrivacyPolicy} />
+        <Route path="/terms-of-service" component={TermsOfService} />
 
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin" component={Dashboard} />
