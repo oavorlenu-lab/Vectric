@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import path from "path";
-import { createClient } from "@supabase/supabase-js";
+import fs from "fs";
 import { db, mediaTable } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { DeleteMediaParams, ListMediaQueryParams } from "@workspace/api-zod";
@@ -9,18 +9,22 @@ import { requireAdmin } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
-function getSupabase() {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set");
-  return createClient(url, key);
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const BUCKET = "media";
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) => {
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `${unique}${path.extname(file.originalname)}`);
+  },
+});
 
 const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (_req, file, cb) => {
     const allowed = /jpeg|jpg|png|gif|webp|svg/;
     const ext = allowed.test(path.extname(file.originalname).toLowerCase());
@@ -56,28 +60,9 @@ router.post("/media", requireAdmin, upload.single("file"), async (req, res): Pro
     return;
   }
 
-  const supabase = getSupabase();
-  const ext = path.extname(req.file.originalname).toLowerCase();
-  const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-  const filename = `${unique}${ext}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from(BUCKET)
-    .upload(filename, req.file.buffer, {
-      contentType: req.file.mimetype,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    res.status(500).json({ error: `Storage upload failed: ${uploadError.message}` });
-    return;
-  }
-
-  const { data: publicData } = supabase.storage.from(BUCKET).getPublicUrl(filename);
-  const fileUrl = publicData.publicUrl;
-
+  const fileUrl = `/api/media/files/${req.file.filename}`;
   const [media] = await db.insert(mediaTable).values({
-    filename,
+    filename: req.file.filename,
     originalName: req.file.originalname,
     url: fileUrl,
     mimeType: req.file.mimetype,
@@ -85,6 +70,17 @@ router.post("/media", requireAdmin, upload.single("file"), async (req, res): Pro
   }).returning();
 
   res.status(201).json({ ...media, createdAt: media.createdAt.toISOString() });
+});
+
+router.get("/media/files/:filename", (req, res): void => {
+  const filename = Array.isArray(req.params.filename) ? req.params.filename[0] : req.params.filename;
+  const sanitized = path.basename(filename);
+  const filePath = path.join(uploadDir, sanitized);
+  if (!fs.existsSync(filePath)) {
+    res.status(404).json({ error: "File not found" });
+    return;
+  }
+  res.sendFile(filePath);
 });
 
 router.delete("/media/:id", requireAdmin, async (req, res): Promise<void> => {
@@ -98,12 +94,11 @@ router.delete("/media/:id", requireAdmin, async (req, res): Promise<void> => {
     res.status(404).json({ error: "Media not found" });
     return;
   }
-
-  try {
-    const supabase = getSupabase();
-    await supabase.storage.from(BUCKET).remove([media.filename]);
-  } catch (_) {}
-
+  // Try to delete the file
+  const filePath = path.join(uploadDir, media.filename);
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
   res.sendStatus(204);
 });
 

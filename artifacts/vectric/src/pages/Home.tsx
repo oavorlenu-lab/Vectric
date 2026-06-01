@@ -12,9 +12,9 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 const SUBSCRIBED_KEY = "vectric_subscribed";
 
 export default function Homepage() {
-  const { data: featuredPosts, isLoading: featuredLoading } = useGetFeaturedPosts({ limit: 4 });
-  const { data: trendingPosts, isLoading: trendingLoading } = useGetTrendingPosts({ limit: 5 });
-  const { data: recentPosts, isLoading: recentLoading } = useGetRecentPosts({ limit: 6 });
+  const { data: featuredPosts } = useGetFeaturedPosts({ limit: 4 });
+  const { data: trendingPosts } = useGetTrendingPosts({ limit: 5 });
+  const { data: recentPosts } = useGetRecentPosts({ limit: 6 });
   const { data: categories } = useGetCategoriesWithCounts();
 
   const subscribe = useSubscribeNewsletter();
@@ -44,28 +44,7 @@ export default function Homepage() {
       <div className="container mx-auto px-4 py-6 md:py-8">
 
         {/* Hero Section */}
-        {featuredLoading ? (
-          <section className="mb-10 md:mb-16 animate-pulse">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
-              <div className="lg:col-span-8">
-                <div className="w-full aspect-[4/3] sm:aspect-[16/9] lg:h-[520px] rounded-xl bg-muted" />
-              </div>
-              <div className="lg:col-span-4 space-y-4">
-                {[1,2,3].map(i => (
-                  <div key={i} className="flex gap-3">
-                    <div className="w-24 sm:w-20 lg:w-28 aspect-[4/3] rounded-lg bg-muted shrink-0" />
-                    <div className="flex-1 space-y-2 py-1">
-                      <div className="h-3 bg-muted rounded w-1/3" />
-                      <div className="h-4 bg-muted rounded" />
-                      <div className="h-4 bg-muted rounded w-4/5" />
-                      <div className="h-3 bg-muted rounded w-1/4" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : heroPost && (
+        {heroPost && (
           <section className="mb-10 md:mb-16">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
 
@@ -157,17 +136,7 @@ export default function Homepage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
-              {recentLoading ? (
-                [1,2,3,4,5,6].map(i => (
-                  <div key={i} className="animate-pulse">
-                    <div className="aspect-[16/9] rounded-xl bg-muted mb-3" />
-                    <div className="h-3 bg-muted rounded w-1/4 mb-2" />
-                    <div className="h-5 bg-muted rounded mb-1" />
-                    <div className="h-5 bg-muted rounded w-5/6 mb-3" />
-                    <div className="h-3 bg-muted rounded w-1/3" />
-                  </div>
-                ))
-              ) : recentPosts?.map(post => (
+              {recentPosts?.map(post => (
                 <div key={post.id} className="group">
                   <div className="aspect-[16/9] rounded-xl overflow-hidden bg-muted mb-3 relative">
                     <Link href={`/blog/${post.slug}`} className="absolute inset-0 z-10" />
@@ -213,18 +182,7 @@ export default function Homepage() {
             <div>
               <h2 className="text-lg font-bold mb-5 pb-2 border-b uppercase tracking-wider">Trending Now</h2>
               <div className="space-y-5">
-                {trendingLoading ? (
-                  [1,2,3,4,5].map(i => (
-                    <div key={i} className="flex gap-3 animate-pulse">
-                      <div className="w-7 h-8 bg-muted rounded shrink-0" />
-                      <div className="flex-1 space-y-2 py-1">
-                        <div className="h-4 bg-muted rounded" />
-                        <div className="h-4 bg-muted rounded w-4/5" />
-                        <div className="h-3 bg-muted rounded w-1/3" />
-                      </div>
-                    </div>
-                  ))
-                ) : trendingPosts?.map((post, i) => (
+                {trendingPosts?.map((post, i) => (
                   <div key={post.id} className="flex gap-3 group">
                     <div className="text-3xl font-serif font-bold text-muted/40 shrink-0 w-7 leading-none pt-1">
                       {i + 1}
