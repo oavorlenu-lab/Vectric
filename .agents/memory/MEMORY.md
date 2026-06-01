@@ -1,0 +1,1 @@
+- [Supabase + Replit connection](supabase-replit-connection.md) — always use the Transaction Pooler URL (port 6543), never the direct connection (port 5432 = IPv6-only, unreachable from Replit).
