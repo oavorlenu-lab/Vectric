@@ -10,7 +10,16 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const dbUrl = process.env.DATABASE_URL;
+const isLocalDb =
+  dbUrl.includes("localhost") ||
+  dbUrl.includes("127.0.0.1") ||
+  dbUrl.includes("helium");
+
+export const pool = new Pool({
+  connectionString: dbUrl,
+  ...(isLocalDb ? {} : { ssl: { rejectUnauthorized: false } }),
+});
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";
