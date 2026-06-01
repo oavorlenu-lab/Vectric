@@ -8,6 +8,9 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Trust the first proxy (Netlify/Render load balancer) so secure cookies work
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,
@@ -28,7 +31,15 @@ app.use(
   }),
 );
 
-app.use(cors({ origin: true, credentials: true }));
+// Allow requests from the configured frontend origin (or all origins in dev)
+const corsOrigin = process.env.CORS_ORIGIN;
+app.use(
+  cors({
+    origin: corsOrigin ? corsOrigin.split(",").map((o) => o.trim()) : true,
+    credentials: true,
+  }),
+);
+
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
@@ -46,6 +57,7 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
   }),

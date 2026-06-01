@@ -1,0 +1,21 @@
+[build]
+  command = "pnpm install --frozen-lockfile && BASE_PATH=/ pnpm --filter @workspace/vectric run build"
+  publish = "artifacts/vectric/dist/public"
+
+[build.environment]
+  NODE_VERSION = "20"
+  BASE_PATH = "/"
+
+# Proxy all /api/* requests to your Render backend.
+# Replace YOUR-RENDER-APP-NAME with your actual Render service name after deploying.
+[[redirects]]
+  from = "/api/*"
+  to = "https://YOUR-RENDER-APP-NAME.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# SPA fallback — all routes that aren't files serve index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
