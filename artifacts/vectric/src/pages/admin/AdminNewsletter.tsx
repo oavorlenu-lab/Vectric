@@ -67,14 +67,15 @@ export default function AdminNewsletter() {
           }
         },
         onError: (err: any) => {
-          const msg = err?.response?.data?.error || err?.message || "Failed to send newsletter";
-          toast.error(msg);
+          const msg = (err?.data as any)?.error || err?.message || "Failed to send newsletter";
+          toast.error(msg, { duration: 8000 });
         }
       }
     );
   };
 
   const hasResendKey = !!settings?.resendApiKey;
+  const hasFromEmail = !!(settings?.newsletterFromEmail || settings?.contactEmail);
 
   return (
     <AdminLayout>
@@ -103,15 +104,25 @@ export default function AdminNewsletter() {
         </TabsList>
 
         <TabsContent value="compose">
-          {!hasResendKey && (
+          {(!hasResendKey || !hasFromEmail) && (
             <Alert className="mb-6 border-amber-200 bg-amber-50 text-amber-900">
               <AlertCircle className="h-4 w-4 text-amber-600" />
-              <AlertDescription>
-                <strong>Email not configured.</strong> Go to{" "}
-                <a href="/admin/settings" className="underline font-medium">Admin → Settings → Email</a>
-                {" "}and add your Resend API key. Get one free at{" "}
-                <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">resend.com</a>
-                {" "}(3,000 emails/month free).
+              <AlertDescription className="space-y-1">
+                <strong>Setup required before you can send newsletters.</strong>
+                <ul className="list-disc list-inside text-sm mt-1 space-y-0.5">
+                  {!hasResendKey && (
+                    <li>
+                      <strong>Resend API Key</strong> is missing — add it in{" "}
+                      <a href="/admin/settings" className="underline font-medium">Admin → Settings → Email</a>
+                    </li>
+                  )}
+                  {!hasFromEmail && (
+                    <li>
+                      <strong>Newsletter From Email</strong> is missing — set it in{" "}
+                      <a href="/admin/settings" className="underline font-medium">Admin → Settings → Email</a>
+                    </li>
+                  )}
+                </ul>
               </AlertDescription>
             </Alert>
           )}
@@ -156,7 +167,7 @@ export default function AdminNewsletter() {
               </p>
               <Button
                 onClick={handleSend}
-                disabled={sendNewsletter.isPending || !hasResendKey || (subscribers?.length || 0) === 0}
+                disabled={sendNewsletter.isPending || !hasResendKey || !hasFromEmail || (subscribers?.length || 0) === 0}
               >
                 <Send className="w-4 h-4 mr-2" />
                 {sendNewsletter.isPending ? "Sending…" : "Send Newsletter"}
