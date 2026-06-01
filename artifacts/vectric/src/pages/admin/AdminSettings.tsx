@@ -174,9 +174,23 @@ export default function AdminSettings() {
               <Label>Resend API Key</Label>
               <Input type="password" value={formData.resendApiKey || ""} onChange={e => handleChange("resendApiKey", e.target.value)} placeholder="re_..." />
               <p className="text-xs text-gray-500">
-                Required to send newsletters to your subscribers. Get a free key at{" "}
+                Required to send newsletters. Get a free key at{" "}
                 <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="underline text-blue-600">resend.com</a>
-                {" "}— free tier includes 3,000 emails/month and requires no credit card.
+                {" "}— free tier includes 3,000 emails/month.
+              </p>
+            </div>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 space-y-1">
+              <p className="font-semibold">⚠️ Two steps required before newsletters will deliver:</p>
+              <ol className="list-decimal list-inside space-y-1 text-amber-700">
+                <li>Add your <strong>Resend API key</strong> above.</li>
+                <li>
+                  Set your <strong>Contact Email</strong> (in the right column) to an email address from a domain you have{" "}
+                  <a href="https://resend.com/domains" target="_blank" rel="noopener noreferrer" className="underline font-medium">verified in Resend</a>.
+                  {" "}This is the address newsletters will be sent <em>from</em>.
+                </li>
+              </ol>
+              <p className="text-xs text-amber-600 mt-1">
+                Example: if your site is <code className="bg-amber-100 px-1 rounded">myblog.com</code>, verify that domain in Resend, then set Contact Email to <code className="bg-amber-100 px-1 rounded">newsletter@myblog.com</code>.
               </p>
             </div>
           </div>

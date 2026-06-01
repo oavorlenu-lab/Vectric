@@ -53,13 +53,21 @@ export default function AdminNewsletter() {
     sendNewsletter.mutate(
       { data: { subject, html: htmlBody, fromName: fromName || undefined } },
       {
-        onSuccess: (result) => {
-          toast.success(result.message || `Sent to ${result.sent} subscribers`);
-          setSubject("");
-          setHtmlBody("");
+        onSuccess: (result: any) => {
+          if (result.error) {
+            toast.error(result.error);
+          } else if (result.warning) {
+            toast.warning(result.warning);
+            setSubject("");
+            setHtmlBody("");
+          } else {
+            toast.success(result.message || `Sent to ${result.sent} subscribers`);
+            setSubject("");
+            setHtmlBody("");
+          }
         },
         onError: (err: any) => {
-          const msg = err?.response?.data?.error || "Failed to send newsletter";
+          const msg = err?.response?.data?.error || err?.message || "Failed to send newsletter";
           toast.error(msg);
         }
       }
