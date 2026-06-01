@@ -1,7 +1,6 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 import { db, mediaTable } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { DeleteMediaParams, ListMediaQueryParams } from "@workspace/api-zod";
@@ -9,22 +8,50 @@ import { requireAdmin } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
-const uploadDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const BUCKET = "media";
+
+function getSupabaseStorageUrl(filename: string): string {
+  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${filename}`;
 }
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadDir),
-  filename: (_req, file, cb) => {
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${unique}${path.extname(file.originalname)}`);
-  },
-});
+async function uploadToSupabase(buffer: Buffer, filename: string, mimeType: string): Promise<string> {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set for media uploads");
+  }
+  const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${filename}`;
+  const res = await fetch(uploadUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      "Content-Type": mimeType,
+      "x-upsert": "true",
+    },
+    body: buffer,
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Supabase upload failed: ${err}`);
+  }
+  return getSupabaseStorageUrl(filename);
+}
+
+async function deleteFromSupabase(filename: string): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return;
+  await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ prefixes: [filename] }),
+  });
+}
 
 const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const allowed = /jpeg|jpg|png|gif|webp|svg/;
     const ext = allowed.test(path.extname(file.originalname).toLowerCase());
@@ -60,27 +87,20 @@ router.post("/media", requireAdmin, upload.single("file"), async (req, res): Pro
     return;
   }
 
-  const fileUrl = `/api/media/files/${req.file.filename}`;
+  const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+  const filename = `${unique}${path.extname(req.file.originalname)}`;
+
+  const publicUrl = await uploadToSupabase(req.file.buffer, filename, req.file.mimetype);
+
   const [media] = await db.insert(mediaTable).values({
-    filename: req.file.filename,
+    filename,
     originalName: req.file.originalname,
-    url: fileUrl,
+    url: publicUrl,
     mimeType: req.file.mimetype,
     size: req.file.size,
   }).returning();
 
   res.status(201).json({ ...media, createdAt: media.createdAt.toISOString() });
-});
-
-router.get("/media/files/:filename", (req, res): void => {
-  const filename = Array.isArray(req.params.filename) ? req.params.filename[0] : req.params.filename;
-  const sanitized = path.basename(filename);
-  const filePath = path.join(uploadDir, sanitized);
-  if (!fs.existsSync(filePath)) {
-    res.status(404).json({ error: "File not found" });
-    return;
-  }
-  res.sendFile(filePath);
 });
 
 router.delete("/media/:id", requireAdmin, async (req, res): Promise<void> => {
@@ -94,11 +114,7 @@ router.delete("/media/:id", requireAdmin, async (req, res): Promise<void> => {
     res.status(404).json({ error: "Media not found" });
     return;
   }
-  // Try to delete the file
-  const filePath = path.join(uploadDir, media.filename);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
+  await deleteFromSupabase(media.filename);
   res.sendStatus(204);
 });
 
