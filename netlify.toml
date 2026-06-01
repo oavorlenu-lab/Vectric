@@ -6,11 +6,9 @@
   NODE_VERSION = "20"
   BASE_PATH = "/"
 
-# Proxy all /api/* requests to your Render backend.
-# Replace YOUR-RENDER-APP-NAME with your actual Render service name after deploying.
 [[redirects]]
   from = "/api/*"
-  to = "https://YOUR-RENDER-APP-NAME.onrender.com/api/:splat"
+  to = "https://vectric.onrender.com/api/:splat"
   status = 200
   force = true
 
