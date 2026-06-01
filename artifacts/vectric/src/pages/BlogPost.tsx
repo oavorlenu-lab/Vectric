@@ -219,6 +219,8 @@ export default function BlogPost() {
                 dangerouslySetInnerHTML={{ __html: contentWithIds }}
               />
 
+              <AdSlot position="article_mid_content" />
+
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-12 pt-8 border-t">
