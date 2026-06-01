@@ -1,6 +1,7 @@
 import { useParams } from "wouter";
 import { Link } from "wouter";
 import { PublicLayout } from "@/components/layout/PublicLayout";
+import { SeoHead } from "@/components/SeoHead";
 import { useListPosts, useGetCategoriesWithCounts } from "@workspace/api-client-react";
 import { formatDate } from "@/lib/format";
 import { AdSlot } from "@/components/AdSlot";
@@ -16,8 +17,15 @@ export default function Category() {
     { query: { enabled: !!slug } }
   );
 
+  const categoryName = category?.name || slug?.replace(/-/g, " ") || "";
+
   return (
     <PublicLayout>
+      <SeoHead
+        title={categoryName}
+        description={category?.description || `Browse all articles in ${categoryName} on Vectric.`}
+        image={category?.imageUrl}
+      />
       <div className="bg-muted border-b">
         <div className="container mx-auto px-4 py-16 max-w-4xl text-center">
           <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 capitalize">

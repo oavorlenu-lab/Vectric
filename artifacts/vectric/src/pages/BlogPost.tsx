@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useGetPostBySlug, useIncrementPostView, useListRelatedPosts } from "@workspace/api-client-react";
 import { Link, useParams } from "wouter";
 import { PublicLayout } from "@/components/layout/PublicLayout";
+import { SeoHead } from "@/components/SeoHead";
 import { formatDate } from "@/lib/format";
 import { AdSlot } from "@/components/AdSlot";
 import { Button } from "@/components/ui/button";
@@ -106,6 +107,18 @@ export default function BlogPost() {
 
   return (
     <PublicLayout>
+      <SeoHead
+        title={post.seoTitle || post.title}
+        description={post.seoDescription || post.excerpt || undefined}
+        image={post.featuredImageUrl}
+        type="article"
+        article={{
+          publishedAt: post.publishedAt || post.createdAt,
+          updatedAt: post.updatedAt,
+          authorName: post.authorName,
+          tags: post.tags,
+        }}
+      />
       <article className="pb-20">
         <header className="container mx-auto px-4 pt-16 pb-12 max-w-4xl text-center">
           {post.categoryName && (

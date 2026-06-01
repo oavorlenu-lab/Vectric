@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useGetTrendingPosts, useGetFeaturedPosts, useGetRecentPosts, useGetCategoriesWithCounts, useSubscribeNewsletter } from "@workspace/api-client-react";
 import { AdSlot } from "@/components/AdSlot";
+import { SeoHead } from "@/components/SeoHead";
 import { formatDate } from "@/lib/format";
 import { ArrowRight, ChevronRight, Mail, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -39,6 +40,7 @@ export default function Homepage() {
 
   return (
     <PublicLayout>
+      <SeoHead />
       <div className="container mx-auto px-4 py-6 md:py-8">
 
         {/* Hero Section */}
