@@ -70,3 +70,8 @@ externalPort = 80
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+SUPABASE_URL = "https://awhhehxsjhgwassjqaia.supabase.co"
