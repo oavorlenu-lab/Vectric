@@ -20,6 +20,7 @@ const isLocalDb =
 export const pool = new Pool({
   connectionString: dbUrl,
   ssl: isLocalDb ? false : { rejectUnauthorized: false },
+  family: 4,
 });
 export const db = drizzle(pool, { schema });
 
