@@ -10,8 +10,11 @@ function buildConnectionUrl(raw: string): string {
     raw.includes("localhost") ||
     raw.includes("127.0.0.1") ||
     raw.includes("helium");
-  if (isLocal || raw.includes("sslmode=")) return raw;
-  return raw.includes("?") ? `${raw}&sslmode=require` : `${raw}?sslmode=require`;
+  if (isLocal) return raw;
+  // Remove any existing sslmode param then append the libpq-compatible SSL flag
+  const base = raw.replace(/[?&]sslmode=[^&]*/g, "").replace(/[?&]uselibpqcompat=[^&]*/g, "");
+  const sep = base.includes("?") ? "&" : "?";
+  return `${base}${sep}uselibpqcompat=true&sslmode=require`;
 }
 
 const dbUrl = buildConnectionUrl(process.env.DATABASE_URL);

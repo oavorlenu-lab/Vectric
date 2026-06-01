@@ -1,0 +1,27 @@
+2026-06-01T08:50:02.980480357Z ==> Cloning from https://github.com/oavorlenu-lab/Vectric
+2026-06-01T08:50:03.734261168Z ==> Checking out commit 4e16499b3a48599ff563f150cf6447d527d1081e in branch main
+2026-06-01T08:50:05.029182241Z ==> Using Node.js version 24.14.1 (default)
+2026-06-01T08:50:05.029192901Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-06-01T08:50:05.071424165Z ==> Running build command 'pnpm install --frozen-lockfile && pnpm --filter @workspace/db run push && pnpm --filter @workspace/api-server run build'...
+2026-06-01T08:50:12.884339597Z 
+2026-06-01T08:50:12.884369597Z > @workspace/db@0.0.0 push /opt/render/project/src/lib/db
+2026-06-01T08:50:12.884375447Z > drizzle-kit push --config ./drizzle.config.ts
+2026-06-01T08:50:12.884378587Z 
+2026-06-01T08:50:13.02324425Z Reading config file '/opt/render/project/src/lib/db/drizzle.config.ts'
+2026-06-01T08:50:13.443893915Z Using 'pg' driver for database querying
+2026-06-01T08:50:13.769627086Z [⣷] Pulling schema from database...
+2026-06-01T08:50:13.770071018Z (node:164) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+2026-06-01T08:50:13.770081528Z In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+2026-06-01T08:50:13.770084318Z 
+2026-06-01T08:50:13.770087578Z To prepare for this change:
+2026-06-01T08:50:13.770090918Z - If you want the current behavior, explicitly use 'sslmode=verify-full'
+2026-06-01T08:50:13.770093368Z - If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+2026-06-01T08:50:13.770095648Z 
+2026-06-01T08:50:13.770099168Z See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+2026-06-01T08:50:13.770101558Z (Use `node --trace-warnings ...` to show where the warning was created)
+2026-06-01T08:50:13.782444104Z [⣷] Pulling schema from database...
+2026-06-01T08:50:13.824137644Z /opt/render/project/src/lib/db:
+2026-06-01T08:50:13.824157964Z  ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/db@0.0.0 push: `drizzle-kit push --config ./drizzle.config.ts`
+2026-06-01T08:50:13.824163024Z Exit status 1
+2026-06-01T08:50:13.875334054Z ==> Build failed 😞
+2026-06-01T08:50:13.875351984Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
