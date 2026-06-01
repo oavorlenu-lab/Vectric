@@ -1,0 +1,36 @@
+2026-06-01T09:14:35.718608569Z ==> Downloading cache...
+2026-06-01T09:14:35.753510561Z ==> Cloning from https://github.com/oavorlenu-lab/Vectric
+2026-06-01T09:14:36.42951188Z ==> Checking out commit 730fe323d10cae4c4e77afe6455a610efedbd82a in branch main
+2026-06-01T09:14:41.825909614Z ==> Downloaded 98MB in 4s. Extraction took 2s.
+2026-06-01T09:14:46.216343988Z ==> Using Node.js version 24.14.1 (default)
+2026-06-01T09:14:46.216354888Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-06-01T09:14:46.266258109Z ==> Running build command 'pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build'...
+2026-06-01T09:14:51.099166362Z 
+2026-06-01T09:14:51.099190003Z > @workspace/api-server@0.0.0 build /opt/render/project/src/artifacts/api-server
+2026-06-01T09:14:51.099200053Z > node ./build.mjs
+2026-06-01T09:14:51.099206013Z 
+2026-06-01T09:14:51.677321382Z 
+2026-06-01T09:14:51.677346243Z   dist/index.mjs                       2.9mb ⚠️
+2026-06-01T09:14:51.677352833Z   dist/pino-worker.mjs               153.4kb
+2026-06-01T09:14:51.677357753Z   dist/pino-file.mjs                 142.1kb
+2026-06-01T09:14:51.677362373Z   dist/pino-pretty.mjs               114.6kb
+2026-06-01T09:14:51.677367233Z   dist/thread-stream-worker.mjs        7.3kb
+2026-06-01T09:14:51.677371963Z   dist/index.mjs.map                   5.0mb
+2026-06-01T09:14:51.677376553Z   dist/pino-worker.mjs.map           256.9kb
+2026-06-01T09:14:51.677381003Z   dist/pino-file.mjs.map             229.0kb
+2026-06-01T09:14:51.677384763Z   dist/pino-pretty.mjs.map           204.0kb
+2026-06-01T09:14:51.677387864Z   dist/thread-stream-worker.mjs.map   12.0kb
+2026-06-01T09:14:51.677392014Z 
+2026-06-01T09:14:51.677397384Z ⚡ Done in 524ms
+2026-06-01T09:14:52.601660381Z ==> Uploading build...
+2026-06-01T09:15:02.029331378Z ==> Uploaded in 3.9s. Compression took 5.5s
+2026-06-01T09:15:02.05862084Z ==> Build successful 🎉
+2026-06-01T09:15:08.225150918Z ==> Deploying...
+2026-06-01T09:15:08.369898262Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-06-01T09:15:25.945810237Z ==> Running 'node --enable-source-maps artifacts/api-server/dist/index.mjs'
+2026-06-01T09:15:27.745288474Z Warning: connect.session() MemoryStore is not
+2026-06-01T09:15:27.745316225Z designed for a production environment, as it will leak
+2026-06-01T09:15:27.745319675Z memory, and will not scale past a single process.
+2026-06-01T09:15:29.939606273Z {"level":50,"time":1780305328833,"pid":71,"hostname":"srv-d8ekb4jbc2fs73cl8t8g-hibernate-6fd8bc6d8b-q79zl","err":{"type":"_DrizzleQueryError","message":"Failed query: select \"id\", \"name\", \"position\", \"script\", \"is_enabled\", \"description\" from \"ad_slots\" limit $1\nparams: 1: relation \"ad_slots\" does not exist","stack":"Error: Failed query: select \"id\", \"name\", \"position\", \"script\", \"is_enabled\", \"description\" from \"ad_slots\" limit $1\nparams: 1\n    at NodePgPreparedQuery.queryWithCache (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/pg-core/session.ts:73:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async <anonymous> (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/node-postgres/session.ts:154:19)\n    at async seedAdSlotsIfNeeded (/opt/render/project/src/artifacts/api-server/src/lib/seed.ts:27:20)\n    at async Promise.all (index 1)\ncaused by: error: relation \"ad_slots\" does not exist\n    at <anonymous> (/opt/render/project/src/node_modules/.pnpm/pg-pool@3.13.0_pg@8.20.0/node_modules/pg-pool/index.js:45:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async <anonymous> (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/node-postgres/session.ts:161:13)\n    at async NodePgPreparedQuery.queryWithCache (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/pg-core/session.ts:71:12)\n    at async <anonymous> (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/node-postgres/session.ts:154:19)\n    at async seedAdSlotsIfNeeded (/opt/render/project/src/artifacts/api-server/src/lib/seed.ts:27:20)\n    at async Promise.all (index 1)","query":"select \"id\", \"name\", \"position\", \"script\", \"is_enabled\", \"description\" from \"ad_slots\" limit $1","params":[1]},"msg":"Failed during startup seed"}
+2026-06-01T09:15:35.064589001Z ==> Exited with status 1
+2026-06-01T09:15:35.068939537Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
