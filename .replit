@@ -75,3 +75,4 @@ channel = "stable-25_05"
 
 [userenv.shared]
 SUPABASE_URL = "https://awhhehxsjhgwassjqaia.supabase.co"
+SITE_URL = "https://vectric.onrender.com"

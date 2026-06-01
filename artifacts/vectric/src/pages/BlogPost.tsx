@@ -105,6 +105,18 @@ export default function BlogPost() {
     contentWithIds = doc.body.innerHTML;
   }
 
+  const categorySlug = post.categoryName
+    ? post.categoryName.toLowerCase().replace(/\s+/g, "-")
+    : null;
+
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    ...(post.categoryName && categorySlug
+      ? [{ name: post.categoryName, url: `/category/${categorySlug}` }]
+      : []),
+    { name: post.seoTitle || post.title, url: `/blog/${post.slug}` },
+  ];
+
   return (
     <PublicLayout>
       <SeoHead
@@ -118,6 +130,7 @@ export default function BlogPost() {
           authorName: post.authorName,
           tags: post.tags,
         }}
+        breadcrumbs={breadcrumbs}
       />
       <article className="pb-20">
         <header className="container mx-auto px-4 pt-16 pb-12 max-w-4xl text-center">

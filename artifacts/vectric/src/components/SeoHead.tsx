@@ -1,4 +1,10 @@
 import { Helmet } from "react-helmet-async";
+import { useGetSettings } from "@workspace/api-client-react";
+
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
 
 interface ArticleMeta {
   publishedAt?: string | null;
@@ -13,12 +19,13 @@ interface SeoHeadProps {
   image?: string | null;
   type?: "website" | "article";
   article?: ArticleMeta;
+  breadcrumbs?: BreadcrumbItem[];
   noIndex?: boolean;
 }
 
-const SITE_NAME = "Vectric";
-const DEFAULT_DESCRIPTION =
-  "Vectric is a premium multi-category blog covering Technology, Sports, Business, Health, Travel, Entertainment, Lifestyle, and Science.";
+const FALLBACK_SITE_NAME = "Vectric";
+const FALLBACK_DESCRIPTION =
+  "Vectric brings you the latest news, stories, and insights across tech, lifestyle, business, health, entertainment, and more — all in one place.";
 
 export function SeoHead({
   title,
@@ -26,20 +33,30 @@ export function SeoHead({
   image,
   type = "website",
   article,
+  breadcrumbs,
   noIndex = false,
 }: SeoHeadProps) {
+  const { data: settings } = useGetSettings();
+
+  const siteName = settings?.siteName || FALLBACK_SITE_NAME;
+  const siteDescription = settings?.siteDescription || FALLBACK_DESCRIPTION;
+
   const fullTitle = title
-    ? `${title} — ${SITE_NAME}`
-    : `${SITE_NAME} — Premium Insights Across Every Domain`;
-  const metaDescription = description || DEFAULT_DESCRIPTION;
+    ? `${title} — ${siteName}`
+    : settings?.siteTagline
+    ? `${siteName} — ${settings.siteTagline}`
+    : `${siteName} — Your Daily Read on Everything That Matters`;
+
+  const metaDescription = description || siteDescription;
+
   const canonicalUrl =
     typeof window !== "undefined" ? window.location.href : "";
   const origin =
     typeof window !== "undefined" ? window.location.origin : "";
 
-  const jsonLd =
+  const articleJsonLd =
     type === "article" && article
-      ? JSON.stringify({
+      ? {
           "@context": "https://schema.org",
           "@type": "Article",
           headline: title,
@@ -50,11 +67,11 @@ export function SeoHead({
           ...(article.updatedAt ? { dateModified: article.updatedAt } : {}),
           author: {
             "@type": "Person",
-            name: article.authorName || SITE_NAME,
+            name: article.authorName || siteName,
           },
           publisher: {
             "@type": "Organization",
-            name: SITE_NAME,
+            name: siteName,
             logo: {
               "@type": "ImageObject",
               url: `${origin}/favicon.svg`,
@@ -63,7 +80,39 @@ export function SeoHead({
           ...(article.tags?.length
             ? { keywords: article.tags.join(", ") }
             : {}),
-        })
+        }
+      : null;
+
+  const breadcrumbJsonLd =
+    breadcrumbs && breadcrumbs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: breadcrumbs.map((crumb, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: crumb.name,
+            item: crumb.url.startsWith("http")
+              ? crumb.url
+              : `${origin}${crumb.url}`,
+          })),
+        }
+      : null;
+
+  const websiteJsonLd =
+    type === "website"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: siteName,
+          url: origin,
+          description: siteDescription,
+          potentialAction: {
+            "@type": "SearchAction",
+            target: `${origin}/search?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+          },
+        }
       : null;
 
   return (
@@ -76,13 +125,29 @@ export function SeoHead({
       />
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
+      {/* Open Graph */}
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={metaDescription} />
       <meta property="og:type" content={type} />
-      <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:site_name" content={siteName} />
       {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
       {image && <meta property="og:image" content={image} />}
+      {image && <meta property="og:image:width" content="1200" />}
+      {image && <meta property="og:image:height" content="630" />}
+      {image && <meta property="og:image:type" content="image/jpeg" />}
 
+      {/* Article-specific Open Graph */}
+      {type === "article" && article?.publishedAt && (
+        <meta property="article:published_time" content={article.publishedAt} />
+      )}
+      {type === "article" && article?.updatedAt && (
+        <meta property="article:modified_time" content={article.updatedAt} />
+      )}
+      {type === "article" && article?.authorName && (
+        <meta property="article:author" content={article.authorName} />
+      )}
+
+      {/* Twitter Card */}
       <meta
         name="twitter:card"
         content={image ? "summary_large_image" : "summary"}
@@ -90,9 +155,23 @@ export function SeoHead({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={metaDescription} />
       {image && <meta name="twitter:image" content={image} />}
+      {image && <meta name="twitter:image:alt" content={title || siteName} />}
 
-      {jsonLd && (
-        <script type="application/ld+json">{jsonLd}</script>
+      {/* JSON-LD Structured Data */}
+      {articleJsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(articleJsonLd)}
+        </script>
+      )}
+      {breadcrumbJsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbJsonLd)}
+        </script>
+      )}
+      {websiteJsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(websiteJsonLd)}
+        </script>
       )}
     </Helmet>
   );
