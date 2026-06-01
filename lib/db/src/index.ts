@@ -10,22 +10,15 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-function buildConnectionUrl(raw: string): string {
-  const isLocal =
-    raw.includes("localhost") ||
-    raw.includes("127.0.0.1") ||
-    raw.includes("helium");
-  if (isLocal || raw.includes("sslmode=")) return raw;
-  return raw.includes("?") ? `${raw}&sslmode=require` : `${raw}?sslmode=require`;
-}
-
-const connectionUrl = buildConnectionUrl(process.env.DATABASE_URL);
+const dbUrl = process.env.DATABASE_URL;
+const isLocalDb =
+  dbUrl.includes("localhost") ||
+  dbUrl.includes("127.0.0.1") ||
+  dbUrl.includes("helium");
 
 export const pool = new Pool({
-  connectionString: connectionUrl,
-  ssl: connectionUrl.includes("sslmode=require")
-    ? { rejectUnauthorized: false }
-    : false,
+  connectionString: dbUrl,
+  ssl: isLocalDb ? false : { rejectUnauthorized: false },
 });
 export const db = drizzle(pool, { schema });
 
