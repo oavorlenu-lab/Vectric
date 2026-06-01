@@ -1,0 +1,43 @@
+2026-06-01T09:01:00.768757559Z ==> Cloning from https://github.com/oavorlenu-lab/Vectric
+2026-06-01T09:01:01.447581331Z ==> Checking out commit cf768713e61456f08761c0dfec111e68b1375e96 in branch main
+2026-06-01T09:01:02.814940928Z ==> Using Node.js version 24.14.1 (default)
+2026-06-01T09:01:02.814954739Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-06-01T09:01:02.861725897Z ==> Running build command 'pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build'...
+2026-06-01T09:01:13.400397196Z 
+2026-06-01T09:01:13.400432547Z > @workspace/api-server@0.0.0 build /opt/render/project/src/artifacts/api-server
+2026-06-01T09:01:13.400438577Z > node ./build.mjs
+2026-06-01T09:01:13.400441647Z 
+2026-06-01T09:01:13.939101096Z 
+2026-06-01T09:01:13.939126166Z   dist/index.mjs                       2.9mb ⚠️
+2026-06-01T09:01:13.939131626Z   dist/pino-worker.mjs               153.4kb
+2026-06-01T09:01:13.939135656Z   dist/pino-file.mjs                 142.1kb
+2026-06-01T09:01:13.939139496Z   dist/pino-pretty.mjs               114.6kb
+2026-06-01T09:01:13.939143186Z   dist/thread-stream-worker.mjs        7.3kb
+2026-06-01T09:01:13.939146846Z   dist/index.mjs.map                   5.0mb
+2026-06-01T09:01:13.939150477Z   dist/pino-worker.mjs.map           256.9kb
+2026-06-01T09:01:13.939154117Z   dist/pino-file.mjs.map             229.0kb
+2026-06-01T09:01:13.939157857Z   dist/pino-pretty.mjs.map           204.0kb
+2026-06-01T09:01:13.939161607Z   dist/thread-stream-worker.mjs.map   12.0kb
+2026-06-01T09:01:13.939165197Z 
+2026-06-01T09:01:13.939170077Z ⚡ Done in 477ms
+2026-06-01T09:01:18.958754283Z ==> Uploading build...
+2026-06-01T09:01:29.091079979Z ==> Uploaded in 5.7s. Compression took 4.4s
+2026-06-01T09:01:29.111445751Z ==> Build successful 🎉
+2026-06-01T09:01:33.7444212Z ==> Deploying...
+2026-06-01T09:01:33.797032715Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-06-01T09:01:50.834911355Z ==> Running 'node --enable-source-maps artifacts/api-server/dist/index.mjs'
+2026-06-01T09:01:52.630750277Z Warning: connect.session() MemoryStore is not
+2026-06-01T09:01:52.630778307Z designed for a production environment, as it will leak
+2026-06-01T09:01:52.630782707Z memory, and will not scale past a single process.
+2026-06-01T09:01:52.728469445Z (node:70) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+2026-06-01T09:01:52.728496356Z In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+2026-06-01T09:01:52.728500546Z 
+2026-06-01T09:01:52.728505046Z To prepare for this change:
+2026-06-01T09:01:52.728509466Z - If you want the current behavior, explicitly use 'sslmode=verify-full'
+2026-06-01T09:01:52.728513346Z - If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+2026-06-01T09:01:52.728516746Z 
+2026-06-01T09:01:52.728521056Z See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+2026-06-01T09:01:52.728524806Z (Use `node --trace-warnings ...` to show where the warning was created)
+2026-06-01T09:01:53.831002509Z {"level":50,"time":1780304512741,"pid":70,"hostname":"srv-d8ekb4jbc2fs73cl8t8g-hibernate-74b7b767c9-k8sr4","err":{"type":"_DrizzleQueryError","message":"Failed query: select \"id\", \"username\", \"password_hash\", \"created_at\" from \"admin\" limit $1\nparams: 1: connect ENETUNREACH 2a05:d018:175d:b602:6dc5:afdb:1376:aba6:5432 - Local (:::0)","stack":"Error: Failed query: select \"id\", \"username\", \"password_hash\", \"created_at\" from \"admin\" limit $1\nparams: 1\n    at NodePgPreparedQuery.queryWithCache (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/pg-core/session.ts:73:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async <anonymous> (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/node-postgres/session.ts:154:19)\n    at async seedAdminIfNeeded (/opt/render/project/src/artifacts/api-server/src/lib/seed.ts:18:20)\n    at async Promise.all (index 0)\ncaused by: Error: connect ENETUNREACH 2a05:d018:175d:b602:6dc5:afdb:1376:aba6:5432 - Local (:::0)\n    at <anonymous> (/opt/render/project/src/node_modules/.pnpm/pg-pool@3.13.0_pg@8.20.0/node_modules/pg-pool/index.js:45:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async <anonymous> (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/node-postgres/session.ts:161:13)\n    at async NodePgPreparedQuery.queryWithCache (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/pg-core/session.ts:71:12)\n    at async <anonymous> (/opt/render/project/src/node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.20.0/node_modules/src/node-postgres/session.ts:154:19)\n    at async seedAdminIfNeeded (/opt/render/project/src/artifacts/api-server/src/lib/seed.ts:18:20)\n    at async Promise.all (index 0)","query":"select \"id\", \"username\", \"password_hash\", \"created_at\" from \"admin\" limit $1","params":[1]},"msg":"Failed during startup seed"}
+2026-06-01T09:01:58.197393656Z ==> Exited with status 1
+2026-06-01T09:01:58.199321101Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
