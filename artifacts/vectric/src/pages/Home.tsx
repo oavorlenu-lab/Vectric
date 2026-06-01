@@ -29,6 +29,7 @@ export default function Homepage() {
         localStorage.setItem(SUBSCRIBED_KEY, "true");
         setSubscribed(true);
         setEmail("");
+        window.dispatchEvent(new Event("vectric:subscribed"));
         toast.success("You're subscribed! Welcome aboard.");
       },
       onError: () => toast.error("Failed to subscribe. Please try again."),

@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,12 @@ export function Navbar() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(() => !!localStorage.getItem(SUBSCRIBED_KEY));
   const [, navigate] = useLocation();
+
+  useEffect(() => {
+    const handler = () => setSubscribed(true);
+    window.addEventListener("vectric:subscribed", handler);
+    return () => window.removeEventListener("vectric:subscribed", handler);
+  }, []);
 
   const subscribeNewsletter = useSubscribeNewsletter();
 
