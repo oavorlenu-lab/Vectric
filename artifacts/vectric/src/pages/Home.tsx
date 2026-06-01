@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { useGetTrendingPosts, useGetFeaturedPosts, useGetRecentPosts, useGetCategoriesWithCounts, useSubscribeNewsletter } from "@workspace/api-client-react";
 import { AdSlot } from "@/components/AdSlot";
 import { formatDate } from "@/lib/format";
-import { ArrowRight, ChevronRight, Mail } from "lucide-react";
+import { ArrowRight, ChevronRight, Mail, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { PublicLayout } from "@/components/layout/PublicLayout";
+
+const SUBSCRIBED_KEY = "vectric_subscribed";
 
 export default function Homepage() {
   const { data: featuredPosts } = useGetFeaturedPosts({ limit: 4 });
@@ -16,12 +18,18 @@ export default function Homepage() {
 
   const subscribe = useSubscribeNewsletter();
   const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(() => !!localStorage.getItem(SUBSCRIBED_KEY));
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     subscribe.mutate({ data: { email } }, {
-      onSuccess: () => { toast.success("Subscribed successfully!"); setEmail(""); },
+      onSuccess: () => {
+        localStorage.setItem(SUBSCRIBED_KEY, "true");
+        setSubscribed(true);
+        setEmail("");
+        toast.success("You're subscribed! Welcome aboard.");
+      },
       onError: () => toast.error("Failed to subscribe. Please try again."),
     });
   };
@@ -194,24 +202,36 @@ export default function Homepage() {
 
             {/* Newsletter */}
             <div className="bg-primary/5 rounded-xl p-6 text-center border border-primary/10">
-              <Mail className="w-8 h-8 text-primary mx-auto mb-3" />
-              <h3 className="text-lg font-serif font-bold mb-2">The Vectric Newsletter</h3>
-              <p className="text-muted-foreground text-sm mb-5">
-                Get our best stories delivered to your inbox every week.
-              </p>
-              <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="px-4 py-2.5 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                />
-                <Button type="submit" disabled={subscribe.isPending} className="w-full font-bold">
-                  Subscribe
-                </Button>
-              </form>
+              {subscribed ? (
+                <>
+                  <CheckCircle2 className="w-8 h-8 text-green-500 mx-auto mb-3" />
+                  <h3 className="text-lg font-serif font-bold mb-2">You're subscribed!</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Thank you for subscribing. You'll receive our best stories straight to your inbox.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Mail className="w-8 h-8 text-primary mx-auto mb-3" />
+                  <h3 className="text-lg font-serif font-bold mb-2">The Newsletter</h3>
+                  <p className="text-muted-foreground text-sm mb-5">
+                    Get our best stories delivered to your inbox every week.
+                  </p>
+                  <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
+                    <input
+                      type="email"
+                      placeholder="Your email address"
+                      className="px-4 py-2.5 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      required
+                    />
+                    <Button type="submit" disabled={subscribe.isPending} className="w-full font-bold">
+                      {subscribe.isPending ? "Subscribing…" : "Subscribe"}
+                    </Button>
+                  </form>
+                </>
+              )}
             </div>
 
             {/* Categories */}

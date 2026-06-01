@@ -32,9 +32,22 @@ export default function AdminSettings() {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
+  const SETTINGS_FIELDS = [
+    "siteName","siteTagline","siteDescription","logoUrl","faviconUrl",
+    "googleAnalyticsId","googleSearchConsoleCode","adsenseClientId","grokApiKey",
+    "footerText","socialLinks","headerMenu","footerMenu","contactEmail",
+    "resendApiKey","enableUserRegistration","maintenanceMode",
+  ];
+
   const handleSave = () => {
+    // Strip id, timestamps, and null values — API only accepts string|boolean|undefined
+    const payload: Record<string, any> = {};
+    for (const key of SETTINGS_FIELDS) {
+      const val = formData[key];
+      if (val !== null && val !== undefined) payload[key] = val;
+    }
     updateSettings.mutate(
-      { data: formData },
+      { data: payload },
       {
         onSuccess: () => {
           toast.success("Settings saved");

@@ -1,6 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
-import { seedAdminIfNeeded } from "./lib/seed";
+import { seedAdminIfNeeded, seedAdSlotsIfNeeded } from "./lib/seed";
 
 const rawPort = process.env["PORT"];
 
@@ -16,7 +16,7 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-seedAdminIfNeeded()
+Promise.all([seedAdminIfNeeded(), seedAdSlotsIfNeeded()])
   .then(() => {
     app.listen(port, (err) => {
       if (err) {
