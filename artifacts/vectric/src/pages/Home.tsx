@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetTrendingPosts, useGetFeaturedPosts, useGetRecentPosts, useGetCategoriesWithCounts, useSubscribeNewsletter } from "@workspace/api-client-react";
 import { AdSlot } from "@/components/AdSlot";
 import { SeoHead } from "@/components/SeoHead";
@@ -12,10 +13,10 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 const SUBSCRIBED_KEY = "vectric_subscribed";
 
 export default function Homepage() {
-  const { data: featuredPosts } = useGetFeaturedPosts({ limit: 4 });
-  const { data: trendingPosts } = useGetTrendingPosts({ limit: 5 });
-  const { data: recentPosts } = useGetRecentPosts({ limit: 6 });
-  const { data: categories } = useGetCategoriesWithCounts();
+  const { data: featuredPosts, isLoading: featuredLoading } = useGetFeaturedPosts({ limit: 4 });
+  const { data: trendingPosts, isLoading: trendingLoading } = useGetTrendingPosts({ limit: 5 });
+  const { data: recentPosts, isLoading: recentLoading } = useGetRecentPosts({ limit: 6 });
+  const { data: categories, isLoading: categoriesLoading } = useGetCategoriesWithCounts();
 
   const subscribe = useSubscribeNewsletter();
   const [email, setEmail] = useState("");
@@ -45,12 +46,14 @@ export default function Homepage() {
       <div className="container mx-auto px-4 py-6 md:py-8">
 
         {/* Hero Section */}
-        {heroPost && (
-          <section className="mb-10 md:mb-16">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
+        <section className="mb-10 md:mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
 
-              {/* Main hero card */}
-              <div className="lg:col-span-8">
+            {/* Main hero card */}
+            <div className="lg:col-span-8">
+              {featuredLoading ? (
+                <Skeleton className="w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-auto lg:h-[520px] rounded-xl" />
+              ) : heroPost ? (
                 <div className="group relative overflow-hidden rounded-xl bg-muted w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-auto lg:h-[520px]">
                   <Link href={`/blog/${heroPost.slug}`} className="absolute inset-0 z-10" />
                   {heroPost.featuredImageUrl ? (
@@ -83,45 +86,58 @@ export default function Homepage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              ) : null}
+            </div>
 
-              {/* Sub-featured posts */}
-              {subFeatured.length > 0 && (
-                <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4">
-                  {subFeatured.map((post) => (
-                    <div key={post.id} className="flex gap-3 group">
-                      <div className="w-24 sm:w-20 lg:w-28 aspect-[4/3] rounded-lg overflow-hidden bg-muted relative shrink-0">
-                        <Link href={`/blog/${post.slug}`} className="absolute inset-0 z-10" />
-                        {post.featuredImageUrl ? (
-                          <img
-                            src={post.featuredImageUrl}
-                            alt={post.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
-                        )}
-                      </div>
-                      <div className="flex-1 flex flex-col justify-center min-w-0">
-                        {post.categoryName && (
-                          <span className="text-xs font-bold text-primary tracking-wider uppercase mb-1">
-                            {post.categoryName}
-                          </span>
-                        )}
-                        <h3 className="font-serif font-bold text-sm md:text-base leading-snug mb-1 group-hover:text-primary transition-colors line-clamp-3">
-                          <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                        </h3>
-                        <div className="text-xs text-muted-foreground">
-                          {formatDate(post.publishedAt || post.createdAt)}
-                        </div>
+            {/* Sub-featured posts */}
+            <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4">
+              {featuredLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex gap-3">
+                    <Skeleton className="w-24 sm:w-20 lg:w-28 aspect-[4/3] rounded-lg shrink-0" />
+                    <div className="flex-1 space-y-2 py-1">
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                subFeatured.map((post) => (
+                  <div key={post.id} className="flex gap-3 group">
+                    <div className="w-24 sm:w-20 lg:w-28 aspect-[4/3] rounded-lg overflow-hidden bg-muted relative shrink-0">
+                      <Link href={`/blog/${post.slug}`} className="absolute inset-0 z-10" />
+                      {post.featuredImageUrl ? (
+                        <img
+                          src={post.featuredImageUrl}
+                          alt={post.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
+                      )}
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center min-w-0">
+                      {post.categoryName && (
+                        <span className="text-xs font-bold text-primary tracking-wider uppercase mb-1">
+                          {post.categoryName}
+                        </span>
+                      )}
+                      <h3 className="font-serif font-bold text-sm md:text-base leading-snug mb-1 group-hover:text-primary transition-colors line-clamp-3">
+                        <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                      </h3>
+                      <div className="text-xs text-muted-foreground">
+                        {formatDate(post.publishedAt || post.createdAt)}
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))
               )}
             </div>
-          </section>
-        )}
+
+          </div>
+        </section>
 
         <AdSlot position="homepage_below_hero" />
 
@@ -137,40 +153,53 @@ export default function Homepage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
-              {recentPosts?.map(post => (
-                <div key={post.id} className="group">
-                  <div className="aspect-[16/9] rounded-xl overflow-hidden bg-muted mb-3 relative">
-                    <Link href={`/blog/${post.slug}`} className="absolute inset-0 z-10" />
-                    {post.featuredImageUrl ? (
-                      <img
-                        src={post.featuredImageUrl}
-                        alt={post.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" />
-                    )}
-                  </div>
-                  {post.categoryName && (
-                    <span className="text-xs font-bold text-primary tracking-wider uppercase">
-                      {post.categoryName}
-                    </span>
-                  )}
-                  <h3 className="text-lg md:text-xl font-serif font-bold leading-snug mt-1 mb-2 group-hover:text-primary transition-colors">
-                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                  </h3>
-                  {post.excerpt && (
-                    <p className="text-muted-foreground text-sm line-clamp-2 mb-3">
-                      {post.excerpt}
-                    </p>
-                  )}
-                  <div className="flex items-center text-sm text-muted-foreground gap-2 flex-wrap">
-                    {post.authorName && <span className="font-medium text-foreground">{post.authorName}</span>}
-                    <span>•</span>
-                    <span>{formatDate(post.publishedAt || post.createdAt)}</span>
-                  </div>
-                </div>
-              ))}
+              {recentLoading
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="group">
+                      <Skeleton className="aspect-[16/9] rounded-xl mb-3" />
+                      <Skeleton className="h-3 w-20 mb-2" />
+                      <Skeleton className="h-5 w-full mb-1" />
+                      <Skeleton className="h-5 w-4/5 mb-2" />
+                      <Skeleton className="h-3 w-full mb-1" />
+                      <Skeleton className="h-3 w-3/4 mb-3" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  ))
+                : recentPosts?.map(post => (
+                    <div key={post.id} className="group">
+                      <div className="aspect-[16/9] rounded-xl overflow-hidden bg-muted mb-3 relative">
+                        <Link href={`/blog/${post.slug}`} className="absolute inset-0 z-10" />
+                        {post.featuredImageUrl ? (
+                          <img
+                            src={post.featuredImageUrl}
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" />
+                        )}
+                      </div>
+                      {post.categoryName && (
+                        <span className="text-xs font-bold text-primary tracking-wider uppercase">
+                          {post.categoryName}
+                        </span>
+                      )}
+                      <h3 className="text-lg md:text-xl font-serif font-bold leading-snug mt-1 mb-2 group-hover:text-primary transition-colors">
+                        <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                      </h3>
+                      {post.excerpt && (
+                        <p className="text-muted-foreground text-sm line-clamp-2 mb-3">
+                          {post.excerpt}
+                        </p>
+                      )}
+                      <div className="flex items-center text-sm text-muted-foreground gap-2 flex-wrap">
+                        {post.authorName && <span className="font-medium text-foreground">{post.authorName}</span>}
+                        <span>•</span>
+                        <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+                      </div>
+                    </div>
+                  ))
+              }
             </div>
 
             <AdSlot position="homepage_between_sections" />
@@ -183,23 +212,35 @@ export default function Homepage() {
             <div>
               <h2 className="text-lg font-bold mb-5 pb-2 border-b uppercase tracking-wider">Trending Now</h2>
               <div className="space-y-5">
-                {trendingPosts?.map((post, i) => (
-                  <div key={post.id} className="flex gap-3 group">
-                    <div className="text-3xl font-serif font-bold text-muted/40 shrink-0 w-7 leading-none pt-1">
-                      {i + 1}
-                    </div>
-                    <div>
-                      <h3 className="font-serif font-bold text-base leading-snug mb-1 group-hover:text-primary transition-colors line-clamp-2">
-                        <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                      </h3>
-                      <div className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
-                        {post.categoryName && <span>{post.categoryName}</span>}
-                        <span>•</span>
-                        <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+                {trendingLoading
+                  ? Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className="flex gap-3">
+                        <Skeleton className="w-7 h-8 shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-4 w-3/4" />
+                          <Skeleton className="h-3 w-28" />
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    ))
+                  : trendingPosts?.map((post, i) => (
+                      <div key={post.id} className="flex gap-3 group">
+                        <div className="text-3xl font-serif font-bold text-muted/40 shrink-0 w-7 leading-none pt-1">
+                          {i + 1}
+                        </div>
+                        <div>
+                          <h3 className="font-serif font-bold text-base leading-snug mb-1 group-hover:text-primary transition-colors line-clamp-2">
+                            <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                          </h3>
+                          <div className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
+                            {post.categoryName && <span>{post.categoryName}</span>}
+                            <span>•</span>
+                            <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                }
               </div>
             </div>
 
@@ -241,19 +282,27 @@ export default function Homepage() {
             <div>
               <h2 className="text-lg font-bold mb-5 pb-2 border-b uppercase tracking-wider">Explore</h2>
               <div className="space-y-1">
-                {categories?.map(category => (
-                  <Link
-                    key={category.id}
-                    href={`/category/${category.slug}`}
-                    className="flex items-center justify-between py-2 group hover:text-primary transition-colors"
-                  >
-                    <span className="font-medium">{category.name}</span>
-                    <div className="flex items-center text-muted-foreground text-sm">
-                      <span className="mr-1">{category.postCount}</span>
-                      <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </Link>
-                ))}
+                {categoriesLoading
+                  ? Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className="flex items-center justify-between py-2">
+                        <Skeleton className="h-4 w-28" />
+                        <Skeleton className="h-4 w-8" />
+                      </div>
+                    ))
+                  : categories?.map(category => (
+                      <Link
+                        key={category.id}
+                        href={`/category/${category.slug}`}
+                        className="flex items-center justify-between py-2 group hover:text-primary transition-colors"
+                      >
+                        <span className="font-medium">{category.name}</span>
+                        <div className="flex items-center text-muted-foreground text-sm">
+                          <span className="mr-1">{category.postCount}</span>
+                          <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </Link>
+                    ))
+                }
               </div>
             </div>
 
