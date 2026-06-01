@@ -30,6 +30,7 @@ export const siteSettingsTable = pgTable("site_settings", {
   footerMenu: text("footer_menu"),
   contactEmail: text("contact_email"),
   resendApiKey: text("resend_api_key"),
+  newsletterFromEmail: text("newsletter_from_email"),
   enableUserRegistration: boolean("enable_user_registration").default(false).notNull(),
   maintenanceMode: boolean("maintenance_mode").default(false).notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

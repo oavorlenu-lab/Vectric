@@ -36,7 +36,7 @@ export default function AdminSettings() {
     "siteName","siteTagline","siteDescription","logoUrl","faviconUrl",
     "googleAnalyticsId","googleSearchConsoleCode","adsenseClientId","grokApiKey",
     "footerText","socialLinks","headerMenu","footerMenu","contactEmail",
-    "resendApiKey","enableUserRegistration","maintenanceMode",
+    "resendApiKey","newsletterFromEmail","enableUserRegistration","maintenanceMode",
   ];
 
   const handleSave = () => {
@@ -179,18 +179,16 @@ export default function AdminSettings() {
                 {" "}— free tier includes 3,000 emails/month.
               </p>
             </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 space-y-1">
-              <p className="font-semibold">⚠️ Two steps required before newsletters will deliver:</p>
-              <ol className="list-decimal list-inside space-y-1 text-amber-700">
-                <li>Add your <strong>Resend API key</strong> above.</li>
-                <li>
-                  Set your <strong>Contact Email</strong> (in the right column) to an email address from a domain you have{" "}
-                  <a href="https://resend.com/domains" target="_blank" rel="noopener noreferrer" className="underline font-medium">verified in Resend</a>.
-                  {" "}This is the address newsletters will be sent <em>from</em>.
-                </li>
-              </ol>
-              <p className="text-xs text-amber-600 mt-1">
-                Example: if your site is <code className="bg-amber-100 px-1 rounded">myblog.com</code>, verify that domain in Resend, then set Contact Email to <code className="bg-amber-100 px-1 rounded">newsletter@myblog.com</code>.
+            <div className="space-y-2">
+              <Label>Newsletter From Email</Label>
+              <Input
+                type="email"
+                value={formData.newsletterFromEmail || ""}
+                onChange={e => handleChange("newsletterFromEmail", e.target.value)}
+                placeholder="newsletter@yourdomain.com"
+              />
+              <p className="text-xs text-gray-500">
+                The email address newsletters are sent <em>from</em>. Must be an address you have configured in your Resend account.
               </p>
             </div>
           </div>

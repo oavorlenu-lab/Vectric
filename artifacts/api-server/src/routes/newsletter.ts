@@ -38,10 +38,10 @@ router.post("/newsletter/send", requireAdmin, async (req, res): Promise<void> =>
     return;
   }
 
-  const contactEmail = settings?.contactEmail;
-  if (!contactEmail) {
+  const fromEmail = settings?.newsletterFromEmail || settings?.contactEmail;
+  if (!fromEmail) {
     res.status(400).json({
-      error: "Sender email not configured. Set your Contact Email in Admin → Settings. It must be an email from a domain you have verified in your Resend account.",
+      error: "Newsletter From Email not configured. Set it in Admin → Settings → Email (Newsletter).",
     });
     return;
   }
@@ -56,7 +56,7 @@ router.post("/newsletter/send", requireAdmin, async (req, res): Promise<void> =>
   const resend = new Resend(apiKey);
   const siteName = settings?.siteName || "Newsletter";
   const fromName = parsed.data.fromName || siteName;
-  const fromAddress = `${fromName} <${contactEmail}>`;
+  const fromAddress = `${fromName} <${fromEmail}>`;
 
   let sent = 0;
   let failed = 0;
@@ -69,7 +69,7 @@ router.post("/newsletter/send", requireAdmin, async (req, res): Promise<void> =>
         to: sub.email,
         subject: parsed.data.subject,
         html: parsed.data.html,
-        replyTo: contactEmail,
+        replyTo: fromEmail,
       });
 
       if (result.error) {
@@ -92,8 +92,8 @@ router.post("/newsletter/send", requireAdmin, async (req, res): Promise<void> =>
       failed,
       message: `All ${failed} emails failed to send.`,
       error: firstError
-        ? `Resend error: ${firstError}. Make sure your Contact Email domain is verified in your Resend account at resend.com/domains.`
-        : "All emails failed. Check that your Resend API key is valid and your sender domain is verified.",
+        ? `Resend error: ${firstError}`
+        : "All emails failed. Check that your Resend API key is valid.",
     });
     return;
   }

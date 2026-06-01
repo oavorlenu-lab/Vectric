@@ -36,6 +36,10 @@ export interface SiteSettings {
   footerMenu?: string | null;
   /** @nullable */
   contactEmail?: string | null;
+  /** @nullable */
+  resendApiKey?: string | null;
+  /** @nullable */
+  newsletterFromEmail?: string | null;
   enableUserRegistration?: boolean;
   maintenanceMode?: boolean;
   updatedAt?: string;

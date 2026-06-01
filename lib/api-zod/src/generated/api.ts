@@ -697,6 +697,7 @@ export const UpdateSettingsBody = zod.object({
   "footerMenu": zod.string().optional(),
   "contactEmail": zod.string().optional(),
   "resendApiKey": zod.string().optional(),
+  "newsletterFromEmail": zod.string().optional(),
   "enableUserRegistration": zod.boolean().optional(),
   "maintenanceMode": zod.boolean().optional()
 })
