@@ -338,3 +338,11 @@
     inset: -1px;
   }
 }
+
+/* Hide Replit platform badge */
+#replit-badge,
+[data-replit-badge],
+.replit-badge,
+iframe[src*="replit.com/badge"] {
+  display: none !important;
+}
