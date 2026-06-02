@@ -183,6 +183,7 @@ export function Footer() {
               <li><Link href="/" className="text-muted-foreground hover:text-foreground">Home</Link></li>
               <li><Link href="/about" className="text-muted-foreground hover:text-foreground">About</Link></li>
               <li><Link href="/contact" className="text-muted-foreground hover:text-foreground">Contact</Link></li>
+              <li><Link href="/faq" className="text-muted-foreground hover:text-foreground">FAQ</Link></li>
             </ul>
           </div>
 
