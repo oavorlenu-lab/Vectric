@@ -7,6 +7,10 @@
   BASE_PATH = "/"
   PORT = "3000"
 
+[[edge_functions]]
+  path = "/blog/*"
+  function = "og-tags"
+
 [[redirects]]
   from = "/api/*"
   to = "https://vectric.onrender.com/api/:splat"
