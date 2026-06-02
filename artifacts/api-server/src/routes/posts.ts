@@ -284,14 +284,30 @@ router.get("/posts/:id/related", async (req, res): Promise<void> => {
     res.json([]);
     return;
   }
-  const related = await db.select().from(postsTable)
+
+  // Try same-category posts first
+  let candidates = await db.select().from(postsTable)
     .where(and(
       eq(postsTable.status, "published"),
       post.categoryId ? eq(postsTable.categoryId, post.categoryId) : undefined,
     ))
     .orderBy(desc(postsTable.createdAt))
     .limit(4);
-  const filtered = related.filter((p) => p.id !== post.id).slice(0, 3);
+
+  let filtered = candidates.filter((p) => p.id !== post.id).slice(0, 3);
+
+  // Fall back to latest published posts if not enough same-category results
+  if (filtered.length < 3) {
+    const needed = 3 - filtered.length;
+    const existingIds = new Set([post.id, ...filtered.map((p) => p.id)]);
+    const fallback = await db.select().from(postsTable)
+      .where(eq(postsTable.status, "published"))
+      .orderBy(desc(postsTable.createdAt))
+      .limit(10);
+    const extras = fallback.filter((p) => !existingIds.has(p.id)).slice(0, needed);
+    filtered = [...filtered, ...extras];
+  }
+
   const enriched = await Promise.all(filtered.map(enrichPost));
   res.json(enriched);
 });
