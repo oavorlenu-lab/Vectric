@@ -1,40 +1,47 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import path from "path";
+import { createClient } from "@supabase/supabase-js";
 import { db, mediaTable } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { DeleteMediaParams, ListMediaQueryParams } from "@workspace/api-zod";
 import { requireAdmin } from "../middlewares/auth";
-import { objectStorageClient } from "../replit_integrations/object_storage/objectStorage";
 
 const router: IRouter = Router();
 
-function getObjectStorageBucketId(): string {
-  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
-  if (!bucketId) {
-    throw new Error("DEFAULT_OBJECT_STORAGE_BUCKET_ID is not set. Provision object storage first.");
-  }
-  return bucketId;
+function getSupabaseClient() {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl) throw new Error("SUPABASE_URL is not set.");
+  if (!serviceRoleKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set.");
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false },
+  });
 }
 
-async function uploadToObjectStorage(buffer: Buffer, filename: string, mimeType: string): Promise<string> {
-  const bucketId = getObjectStorageBucketId();
-  const bucket = objectStorageClient.bucket(bucketId);
-  const file = bucket.file(`media/${filename}`);
-  await file.save(buffer, { contentType: mimeType });
-  await file.makePublic();
-  return `https://storage.googleapis.com/${bucketId}/media/${filename}`;
+const STORAGE_BUCKET = "media";
+
+async function uploadToSupabase(
+  buffer: Buffer,
+  filename: string,
+  mimeType: string,
+): Promise<string> {
+  const supabase = getSupabaseClient();
+  const { error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(filename, buffer, {
+      contentType: mimeType,
+      upsert: false,
+    });
+  if (error) throw new Error(`Supabase Storage upload failed: ${error.message}`);
+  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filename);
+  return data.publicUrl;
 }
 
-async function deleteFromObjectStorage(filename: string): Promise<void> {
+async function deleteFromSupabase(filename: string): Promise<void> {
   try {
-    const bucketId = getObjectStorageBucketId();
-    const bucket = objectStorageClient.bucket(bucketId);
-    const file = bucket.file(`media/${filename}`);
-    const [exists] = await file.exists();
-    if (exists) {
-      await file.delete();
-    }
+    const supabase = getSupabaseClient();
+    await supabase.storage.from(STORAGE_BUCKET).remove([filename]);
   } catch {
   }
 }
@@ -60,8 +67,15 @@ router.get("/media", requireAdmin, async (req, res): Promise<void> => {
   const limit = params.success ? (params.data.limit ?? 20) : 20;
   const offset = (page - 1) * limit;
 
-  const items = await db.select().from(mediaTable).orderBy(desc(mediaTable.createdAt)).limit(limit).offset(offset);
-  const [totalRow] = await db.select({ count: sql<number>`count(*)` }).from(mediaTable);
+  const items = await db
+    .select()
+    .from(mediaTable)
+    .orderBy(desc(mediaTable.createdAt))
+    .limit(limit)
+    .offset(offset);
+  const [totalRow] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(mediaTable);
 
   res.json({
     media: items.map((m) => ({ ...m, createdAt: m.createdAt.toISOString() })),
@@ -71,27 +85,39 @@ router.get("/media", requireAdmin, async (req, res): Promise<void> => {
   });
 });
 
-router.post("/media", requireAdmin, upload.single("file"), async (req, res): Promise<void> => {
-  if (!req.file) {
-    res.status(400).json({ error: "No file uploaded" });
-    return;
-  }
+router.post(
+  "/media",
+  requireAdmin,
+  upload.single("file"),
+  async (req, res): Promise<void> => {
+    if (!req.file) {
+      res.status(400).json({ error: "No file uploaded" });
+      return;
+    }
 
-  const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-  const filename = `${unique}${path.extname(req.file.originalname)}`;
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const filename = `${unique}${path.extname(req.file.originalname)}`;
 
-  const publicUrl = await uploadToObjectStorage(req.file.buffer, filename, req.file.mimetype);
+    const publicUrl = await uploadToSupabase(
+      req.file.buffer,
+      filename,
+      req.file.mimetype,
+    );
 
-  const [media] = await db.insert(mediaTable).values({
-    filename,
-    originalName: req.file.originalname,
-    url: publicUrl,
-    mimeType: req.file.mimetype,
-    size: req.file.size,
-  }).returning();
+    const [media] = await db
+      .insert(mediaTable)
+      .values({
+        filename,
+        originalName: req.file.originalname,
+        url: publicUrl,
+        mimeType: req.file.mimetype,
+        size: req.file.size,
+      })
+      .returning();
 
-  res.status(201).json({ ...media, createdAt: media.createdAt.toISOString() });
-});
+    res.status(201).json({ ...media, createdAt: media.createdAt.toISOString() });
+  },
+);
 
 router.delete("/media/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteMediaParams.safeParse(req.params);
@@ -99,12 +125,15 @@ router.delete("/media/:id", requireAdmin, async (req, res): Promise<void> => {
     res.status(400).json({ error: params.error.message });
     return;
   }
-  const [media] = await db.delete(mediaTable).where(eq(mediaTable.id, params.data.id)).returning();
+  const [media] = await db
+    .delete(mediaTable)
+    .where(eq(mediaTable.id, params.data.id))
+    .returning();
   if (!media) {
     res.status(404).json({ error: "Media not found" });
     return;
   }
-  await deleteFromObjectStorage(media.filename);
+  await deleteFromSupabase(media.filename);
   res.sendStatus(204);
 });
 
