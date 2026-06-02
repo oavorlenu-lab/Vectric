@@ -5,48 +5,39 @@ import { db, mediaTable } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { DeleteMediaParams, ListMediaQueryParams } from "@workspace/api-zod";
 import { requireAdmin } from "../middlewares/auth";
+import { ObjectStorageService } from "../replit_integrations/object_storage";
 
 const router: IRouter = Router();
+const objectStorage = new ObjectStorageService();
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const BUCKET = "media";
-
-function getSupabaseStorageUrl(filename: string): string {
-  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${filename}`;
+function getObjectStorageBucketId(): string {
+  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+  if (!bucketId) {
+    throw new Error("DEFAULT_OBJECT_STORAGE_BUCKET_ID is not set. Provision object storage first.");
+  }
+  return bucketId;
 }
 
-async function uploadToSupabase(buffer: Buffer, filename: string, mimeType: string): Promise<string> {
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set for media uploads");
-  }
-  const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${filename}`;
-  const res = await fetch(uploadUrl, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-      "Content-Type": mimeType,
-      "x-upsert": "true",
-    },
-    body: buffer,
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Supabase upload failed: ${err}`);
-  }
-  return getSupabaseStorageUrl(filename);
+async function uploadToObjectStorage(buffer: Buffer, filename: string, mimeType: string): Promise<string> {
+  const bucketId = getObjectStorageBucketId();
+  const bucket = objectStorage["objectStorageClient"].bucket(bucketId);
+  const file = bucket.file(`media/${filename}`);
+  await file.save(buffer, { contentType: mimeType });
+  await file.makePublic();
+  return `https://storage.googleapis.com/${bucketId}/media/${filename}`;
 }
 
-async function deleteFromSupabase(filename: string): Promise<void> {
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return;
-  await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ prefixes: [filename] }),
-  });
+async function deleteFromObjectStorage(filename: string): Promise<void> {
+  try {
+    const bucketId = getObjectStorageBucketId();
+    const bucket = objectStorage["objectStorageClient"].bucket(bucketId);
+    const file = bucket.file(`media/${filename}`);
+    const [exists] = await file.exists();
+    if (exists) {
+      await file.delete();
+    }
+  } catch {
+  }
 }
 
 const upload = multer({
@@ -90,7 +81,7 @@ router.post("/media", requireAdmin, upload.single("file"), async (req, res): Pro
   const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
   const filename = `${unique}${path.extname(req.file.originalname)}`;
 
-  const publicUrl = await uploadToSupabase(req.file.buffer, filename, req.file.mimetype);
+  const publicUrl = await uploadToObjectStorage(req.file.buffer, filename, req.file.mimetype);
 
   const [media] = await db.insert(mediaTable).values({
     filename,
@@ -114,7 +105,7 @@ router.delete("/media/:id", requireAdmin, async (req, res): Promise<void> => {
     res.status(404).json({ error: "Media not found" });
     return;
   }
-  await deleteFromSupabase(media.filename);
+  await deleteFromObjectStorage(media.filename);
   res.sendStatus(204);
 });
 

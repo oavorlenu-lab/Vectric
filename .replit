@@ -51,6 +51,7 @@ waitForPort = 8080
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
 expertMode = true
+integrations = ["javascript_object_storage:2.0.0"]
 
 [postMerge]
 path = "scripts/post-merge.sh"
@@ -75,4 +76,4 @@ channel = "stable-25_05"
 
 [userenv.shared]
 SUPABASE_URL = "https://awhhehxsjhgwassjqaia.supabase.co"
-SITE_URL = "https://vectricblog.netlify.app"
+SITE_URL = "https://${REPLIT_DEV_DOMAIN}"
