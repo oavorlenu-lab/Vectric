@@ -36,6 +36,8 @@ export * from './mediaList';
 export * from './mediaUpload';
 export * from './messageUpdate';
 export * from './newsletterInput';
+export * from './newsletterSendInput';
+export * from './newsletterSendResult';
 export * from './newsletterSubscriber';
 export * from './post';
 export * from './postInput';

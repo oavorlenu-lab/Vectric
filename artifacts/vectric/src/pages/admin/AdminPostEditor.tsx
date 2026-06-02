@@ -25,7 +25,7 @@ export default function AdminPostEditor() {
   const queryClient = useQueryClient();
 
   const { data: post, isLoading: postLoading } = useGetPost(Number(id), {
-    query: { enabled: isEdit }
+    query: { enabled: isEdit } as any
   });
 
   const { data: categories } = useListCategories();

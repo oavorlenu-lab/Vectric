@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /admin
 
-Sitemap: /api/sitemap.xml
+Sitemap: https://vectricblog.netlify.app/api/sitemap.xml

@@ -1162,6 +1162,7 @@ components:
         footerMenu: { type: ["string", "null"] }
         contactEmail: { type: ["string", "null"] }
         resendApiKey: { type: ["string", "null"] }
+        newsletterFromEmail: { type: ["string", "null"] }
         enableUserRegistration: { type: boolean }
         maintenanceMode: { type: boolean }
         updatedAt: { type: string }
@@ -1184,6 +1185,7 @@ components:
         footerMenu: { type: string }
         contactEmail: { type: string }
         resendApiKey: { type: string }
+        newsletterFromEmail: { type: string }
         enableUserRegistration: { type: boolean }
         maintenanceMode: { type: boolean }
 

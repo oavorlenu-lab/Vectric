@@ -80,7 +80,7 @@ export default function Search() {
   const { data: categories } = useGetCategoriesWithCounts();
   const { data: results, isLoading } = useListPosts(
     { search: activeQuery, status: "published", limit: 20 },
-    { query: { enabled: activeQuery.length > 0 } }
+    { query: { enabled: activeQuery.length > 0 } as any }
   );
 
   const commitSearch = useCallback((q: string) => {

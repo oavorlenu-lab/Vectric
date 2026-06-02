@@ -15,11 +15,11 @@ export default function BlogPost() {
   const [viewTracked, setViewTracked] = useState(false);
   
   const { data: post, isLoading } = useGetPostBySlug(slug || "", {
-    query: { enabled: !!slug }
+    query: { enabled: !!slug } as any
   });
   
   const { data: relatedPosts } = useListRelatedPosts(post?.id || 0, {
-    query: { enabled: !!post?.id }
+    query: { enabled: !!post?.id } as any
   });
   
   const incrementView = useIncrementPostView();

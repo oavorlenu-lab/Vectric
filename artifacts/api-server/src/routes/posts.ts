@@ -147,8 +147,13 @@ router.get("/sitemap.xml", async (_req, res): Promise<void> => {
     .from(categoriesTable);
 
   // Determine the host — SITE_URL takes priority (set this to your custom domain)
-  const host = process.env.SITE_URL
-    ? process.env.SITE_URL.replace(/\/+$/, "")
+  // Guard against unresolved template literals like "${REPLIT_DEV_DOMAIN}"
+  const rawSiteUrl = process.env.SITE_URL || "";
+  const siteUrlIsResolved = rawSiteUrl && !rawSiteUrl.includes("${");
+  const host = siteUrlIsResolved
+    ? rawSiteUrl.replace(/\/+$/, "")
+    : process.env.REPLIT_DEV_DOMAIN
+    ? `https://${process.env.REPLIT_DEV_DOMAIN}`
     : process.env.REPLIT_DOMAINS?.split(",")[0]
     ? `https://${process.env.REPLIT_DOMAINS.split(",")[0]}`
     : "https://yourdomain.com";
@@ -223,8 +228,12 @@ ${postEntries}
 });
 
 router.get("/robots.txt", (_req, res): void => {
-  const host = process.env.SITE_URL
-    ? process.env.SITE_URL.replace(/\/+$/, "")
+  const rawSiteUrl = process.env.SITE_URL || "";
+  const siteUrlIsResolved = rawSiteUrl && !rawSiteUrl.includes("${");
+  const host = siteUrlIsResolved
+    ? rawSiteUrl.replace(/\/+$/, "")
+    : process.env.REPLIT_DEV_DOMAIN
+    ? `https://${process.env.REPLIT_DEV_DOMAIN}`
     : process.env.REPLIT_DOMAINS?.split(",")[0]
     ? `https://${process.env.REPLIT_DOMAINS.split(",")[0]}`
     : "https://yourdomain.com";

@@ -20,8 +20,9 @@ const isLocalDb =
 export const pool = new Pool({
   connectionString: dbUrl,
   ssl: isLocalDb ? false : { rejectUnauthorized: false },
-  family: 4,
-});
+  // family:4 forces IPv4 — required for Supabase on Replit (IPv6 unreachable)
+  ...(({ family: 4 }) as Record<string, unknown>),
+} as ConstructorParameters<typeof Pool>[0]);
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";

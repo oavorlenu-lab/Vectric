@@ -5,10 +5,9 @@ import { db, mediaTable } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { DeleteMediaParams, ListMediaQueryParams } from "@workspace/api-zod";
 import { requireAdmin } from "../middlewares/auth";
-import { ObjectStorageService } from "../replit_integrations/object_storage";
+import { objectStorageClient } from "../replit_integrations/object_storage/objectStorage";
 
 const router: IRouter = Router();
-const objectStorage = new ObjectStorageService();
 
 function getObjectStorageBucketId(): string {
   const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
@@ -20,7 +19,7 @@ function getObjectStorageBucketId(): string {
 
 async function uploadToObjectStorage(buffer: Buffer, filename: string, mimeType: string): Promise<string> {
   const bucketId = getObjectStorageBucketId();
-  const bucket = objectStorage["objectStorageClient"].bucket(bucketId);
+  const bucket = objectStorageClient.bucket(bucketId);
   const file = bucket.file(`media/${filename}`);
   await file.save(buffer, { contentType: mimeType });
   await file.makePublic();
@@ -30,7 +29,7 @@ async function uploadToObjectStorage(buffer: Buffer, filename: string, mimeType:
 async function deleteFromObjectStorage(filename: string): Promise<void> {
   try {
     const bucketId = getObjectStorageBucketId();
-    const bucket = objectStorage["objectStorageClient"].bucket(bucketId);
+    const bucket = objectStorageClient.bucket(bucketId);
     const file = bucket.file(`media/${filename}`);
     const [exists] = await file.exists();
     if (exists) {

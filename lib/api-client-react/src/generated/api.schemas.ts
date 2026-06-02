@@ -265,6 +265,20 @@ export interface MessageUpdate {
   isRead?: boolean;
 }
 
+export interface NewsletterSendInput {
+  /** @minLength 1 */
+  subject: string;
+  /** @minLength 1 */
+  html: string;
+  fromName?: string;
+}
+
+export interface NewsletterSendResult {
+  sent: number;
+  failed: number;
+  message?: string;
+}
+
 export interface NewsletterSubscriber {
   id: number;
   email: string;
@@ -274,18 +288,6 @@ export interface NewsletterSubscriber {
 
 export interface NewsletterInput {
   email: string;
-}
-
-export interface NewsletterSendInput {
-  subject: string;
-  html: string;
-  fromName?: string;
-}
-
-export interface NewsletterSendResult {
-  sent: number;
-  failed: number;
-  message?: string;
 }
 
 export interface AdSlot {
@@ -336,6 +338,8 @@ export interface SiteSettings {
   contactEmail?: string | null;
   /** @nullable */
   resendApiKey?: string | null;
+  /** @nullable */
+  newsletterFromEmail?: string | null;
   enableUserRegistration?: boolean;
   maintenanceMode?: boolean;
   updatedAt?: string;
@@ -357,6 +361,7 @@ export interface SiteSettingsUpdate {
   footerMenu?: string;
   contactEmail?: string;
   resendApiKey?: string;
+  newsletterFromEmail?: string;
   enableUserRegistration?: boolean;
   maintenanceMode?: boolean;
 }

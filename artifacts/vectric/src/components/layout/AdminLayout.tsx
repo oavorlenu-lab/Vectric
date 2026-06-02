@@ -1,4 +1,5 @@
 import { ReactNode, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminGuard } from "../AdminGuard";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,9 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <AdminGuard>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="flex min-h-screen bg-gray-50/50">
         {/* Mobile overlay */}
         {sidebarOpen && (

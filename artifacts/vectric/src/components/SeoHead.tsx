@@ -26,6 +26,7 @@ interface SeoHeadProps {
 const FALLBACK_SITE_NAME = "Vectric";
 const FALLBACK_DESCRIPTION =
   "Vectric brings you the latest news, stories, and insights across tech, lifestyle, business, health, entertainment, and more — all in one place.";
+const FALLBACK_OG_IMAGE = "/og-image.jpg";
 
 export function SeoHead({
   title,
@@ -49,10 +50,15 @@ export function SeoHead({
 
   const metaDescription = description || siteDescription;
 
-  const canonicalUrl =
-    typeof window !== "undefined" ? window.location.href : "";
+  // Use pathname only (strip query params & hash) to avoid duplicate-content canonical issues
   const origin =
     typeof window !== "undefined" ? window.location.origin : "";
+  const canonicalUrl =
+    typeof window !== "undefined"
+      ? window.location.origin + window.location.pathname
+      : "";
+
+  const ogImage = image || (origin ? `${origin}${FALLBACK_OG_IMAGE}` : FALLBACK_OG_IMAGE);
 
   const articleJsonLd =
     type === "article" && article
@@ -61,7 +67,7 @@ export function SeoHead({
           "@type": "Article",
           headline: title,
           description: metaDescription,
-          ...(image ? { image } : {}),
+          image: ogImage,
           url: canonicalUrl,
           ...(article.publishedAt ? { datePublished: article.publishedAt } : {}),
           ...(article.updatedAt ? { dateModified: article.updatedAt } : {}),
@@ -131,10 +137,10 @@ export function SeoHead({
       <meta property="og:type" content={type} />
       <meta property="og:site_name" content={siteName} />
       {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-      {image && <meta property="og:image" content={image} />}
-      {image && <meta property="og:image:width" content="1200" />}
-      {image && <meta property="og:image:height" content="630" />}
-      {image && <meta property="og:image:type" content="image/jpeg" />}
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:type" content="image/jpeg" />
 
       {/* Article-specific Open Graph */}
       {type === "article" && article?.publishedAt && (
@@ -148,14 +154,11 @@ export function SeoHead({
       )}
 
       {/* Twitter Card */}
-      <meta
-        name="twitter:card"
-        content={image ? "summary_large_image" : "summary"}
-      />
+      <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={metaDescription} />
-      {image && <meta name="twitter:image" content={image} />}
-      {image && <meta name="twitter:image:alt" content={title || siteName} />}
+      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image:alt" content={title || siteName} />
 
       {/* JSON-LD Structured Data */}
       {articleJsonLd && (

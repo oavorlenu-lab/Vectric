@@ -14,7 +14,7 @@ export default function Category() {
 
   const { data: results, isLoading } = useListPosts(
     { category: slug, limit: 20 },
-    { query: { enabled: !!slug } }
+    { query: { enabled: !!slug } as any }
   );
 
   const categoryName = category?.name || slug?.replace(/-/g, " ") || "";

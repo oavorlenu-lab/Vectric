@@ -5,9 +5,7 @@ import { useGetAdminMe } from "@workspace/api-client-react";
 export function AdminGuard({ children }: { children: ReactNode }) {
   const [location, setLocation] = useLocation();
   const { data: admin, isLoading, error } = useGetAdminMe({
-    query: {
-      retry: false,
-    }
+    query: { retry: false } as any
   });
 
   useEffect(() => {
