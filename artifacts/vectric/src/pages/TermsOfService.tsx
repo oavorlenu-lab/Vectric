@@ -1,4 +1,5 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
+import { SeoHead } from "@/components/SeoHead";
 import { useGetSettings } from "@workspace/api-client-react";
 
 export default function TermsOfService() {
@@ -9,6 +10,14 @@ export default function TermsOfService() {
 
   return (
     <PublicLayout>
+      <SeoHead
+        title="Terms of Service"
+        description={`Read ${siteName}'s Terms of Service to understand the rules and conditions for using our website and content.`}
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Terms of Service", url: "/terms-of-service" },
+        ]}
+      />
       <div className="container mx-auto px-4 py-16 max-w-3xl">
         <h1 className="text-4xl font-serif font-bold mb-2">Terms of Service</h1>
         <p className="text-muted-foreground mb-10">Last updated: {updatedDate}</p>

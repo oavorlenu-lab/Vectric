@@ -1,4 +1,5 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
+import { SeoHead } from "@/components/SeoHead";
 import { useGetSettings } from "@workspace/api-client-react";
 
 export default function About() {
@@ -6,6 +7,14 @@ export default function About() {
 
   return (
     <PublicLayout>
+      <SeoHead
+        title={`About ${settings?.siteName || "Vectric"}`}
+        description={settings?.siteDescription || "Learn about Vectric — a premium destination for authoritative, beautiful, and thoughtful publishing across tech, lifestyle, business, health, and more."}
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "About", url: "/about" },
+        ]}
+      />
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6">About {settings?.siteName || "Vectric"}</h1>

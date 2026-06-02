@@ -16,6 +16,7 @@ import About from "@/pages/About";
 import Login from "@/pages/Login";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
+import FAQ from "@/pages/FAQ";
 
 import AdminLogin from "@/pages/admin/AdminLogin";
 import Dashboard from "@/pages/admin/Dashboard";
@@ -53,6 +54,7 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />
         <Route path="/terms-of-service" component={TermsOfService} />
+        <Route path="/faq" component={FAQ} />
 
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin" component={Dashboard} />

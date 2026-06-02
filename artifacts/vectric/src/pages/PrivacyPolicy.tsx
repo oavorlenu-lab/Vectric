@@ -1,4 +1,5 @@
 import { PublicLayout } from "@/components/layout/PublicLayout";
+import { SeoHead } from "@/components/SeoHead";
 import { useGetSettings } from "@workspace/api-client-react";
 
 export default function PrivacyPolicy() {
@@ -9,6 +10,14 @@ export default function PrivacyPolicy() {
 
   return (
     <PublicLayout>
+      <SeoHead
+        title="Privacy Policy"
+        description={`Read ${siteName}'s Privacy Policy to understand how we collect, use, and protect your personal information.`}
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Privacy Policy", url: "/privacy-policy" },
+        ]}
+      />
       <div className="container mx-auto px-4 py-16 max-w-3xl">
         <h1 className="text-4xl font-serif font-bold mb-2">Privacy Policy</h1>
         <p className="text-muted-foreground mb-10">Last updated: {updatedDate}</p>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { PublicLayout } from "@/components/layout/PublicLayout";
+import { SeoHead } from "@/components/SeoHead";
 import { useSendMessage, useGetSettings } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,14 @@ export default function Contact() {
 
   return (
     <PublicLayout>
+      <SeoHead
+        title="Contact Us"
+        description="Get in touch with the Vectric team. Whether you have feedback, a story pitch, or a partnership enquiry — we'd love to hear from you."
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Contact", url: "/contact" },
+        ]}
+      />
       <div className="container mx-auto px-4 py-16 max-w-6xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           <div>
