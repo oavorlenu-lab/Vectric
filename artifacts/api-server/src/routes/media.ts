@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import path from "path";
+import sharp from "sharp";
 import { createClient } from "@supabase/supabase-js";
 import { db, mediaTable } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
@@ -20,6 +21,34 @@ function getSupabaseClient() {
 }
 
 const STORAGE_BUCKET = "media";
+const MAX_DIMENSION = 2000;
+
+interface CompressResult {
+  buffer: Buffer;
+  mimeType: string;
+  ext: string;
+}
+
+async function compressImage(
+  buffer: Buffer,
+  mimeType: string,
+  originalExt: string,
+): Promise<CompressResult> {
+  const passThrough = [".svg", ".gif"];
+  if (passThrough.includes(originalExt.toLowerCase())) {
+    return { buffer, mimeType, ext: originalExt };
+  }
+
+  const compressed = await sharp(buffer)
+    .resize(MAX_DIMENSION, MAX_DIMENSION, {
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .webp({ quality: 82 })
+    .toBuffer();
+
+  return { buffer: compressed, mimeType: "image/webp", ext: ".webp" };
+}
 
 async function uploadToSupabase(
   buffer: Buffer,
@@ -95,14 +124,18 @@ router.post(
       return;
     }
 
+    const originalExt = path.extname(req.file.originalname);
     const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const filename = `${unique}${path.extname(req.file.originalname)}`;
 
-    const publicUrl = await uploadToSupabase(
+    const { buffer, mimeType, ext } = await compressImage(
       req.file.buffer,
-      filename,
       req.file.mimetype,
+      originalExt,
     );
+
+    const filename = `${unique}${ext}`;
+
+    const publicUrl = await uploadToSupabase(buffer, filename, mimeType);
 
     const [media] = await db
       .insert(mediaTable)
@@ -110,8 +143,8 @@ router.post(
         filename,
         originalName: req.file.originalname,
         url: publicUrl,
-        mimeType: req.file.mimetype,
-        size: req.file.size,
+        mimeType,
+        size: buffer.length,
       })
       .returning();
 
