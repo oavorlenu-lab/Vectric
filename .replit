@@ -80,5 +80,5 @@ channel = "stable-25_05"
 
 [userenv.shared]
 SUPABASE_URL = "https://awhhehxsjhgwassjqaia.supabase.co"
-SITE_URL = "https://${REPLIT_DEV_DOMAIN}"
+SITE_URL = "https://vectric.online"
 CORS_ORIGIN = "https://vectric.online,https://www.vectric.online"

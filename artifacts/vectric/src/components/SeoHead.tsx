@@ -26,7 +26,8 @@ interface SeoHeadProps {
 const FALLBACK_SITE_NAME = "Vectric";
 const FALLBACK_DESCRIPTION =
   "Vectric brings you the latest news, stories, and insights across tech, lifestyle, business, health, entertainment, and more — all in one place.";
-const FALLBACK_OG_IMAGE = "/og-image.jpg";
+const SITE_URL = "https://vectric.online";
+const FALLBACK_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 export function SeoHead({
   title,
@@ -52,13 +53,15 @@ export function SeoHead({
 
   // Use pathname only (strip query params & hash) to avoid duplicate-content canonical issues
   const origin =
-    typeof window !== "undefined" ? window.location.origin : "";
+    typeof window !== "undefined" ? window.location.origin : SITE_URL;
   const canonicalUrl =
     typeof window !== "undefined"
       ? window.location.origin + window.location.pathname
-      : "";
+      : SITE_URL;
 
-  const ogImage = image || (origin ? `${origin}${FALLBACK_OG_IMAGE}` : FALLBACK_OG_IMAGE);
+  const ogImage = image
+    ? image.startsWith("http") ? image : `${origin}${image}`
+    : FALLBACK_OG_IMAGE;
 
   const articleJsonLd =
     type === "article" && article

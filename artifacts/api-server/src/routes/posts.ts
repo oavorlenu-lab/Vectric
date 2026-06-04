@@ -19,6 +19,13 @@ import { requireAdmin } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
+function pingSitemapGoogle(): void {
+  const siteUrl = process.env.SITE_URL;
+  if (!siteUrl) return;
+  const ping = `https://www.google.com/ping?sitemap=${encodeURIComponent(`${siteUrl}/sitemap.xml`)}`;
+  fetch(ping).catch(() => {/* fire-and-forget */});
+}
+
 function generateSlug(title: string): string {
   return title
     .toLowerCase()
@@ -240,7 +247,7 @@ router.get("/robots.txt", (_req, res): void => {
 
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Cache-Control", "public, max-age=86400");
-  res.send(`User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: ${host}/api/sitemap.xml\n`);
+  res.send(`User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: ${host}/sitemap.xml\n`);
 });
 
 router.get("/posts/trending", async (req, res): Promise<void> => {
@@ -360,6 +367,7 @@ router.post("/posts", requireAdmin, async (req, res): Promise<void> => {
   }
 
   const enriched = await enrichPost(post);
+  if (rest.status === "published") pingSitemapGoogle();
   res.status(201).json(enriched);
 });
 
@@ -395,6 +403,7 @@ router.patch("/posts/:id", requireAdmin, async (req, res): Promise<void> => {
   }
 
   const enriched = await enrichPost(post);
+  if (rest.status === "published") pingSitemapGoogle();
   res.json(enriched);
 });
 
