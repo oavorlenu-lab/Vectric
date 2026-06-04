@@ -8,7 +8,7 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
-// Trust the first proxy (Netlify/Render load balancer) so secure cookies work
+// Trust the first proxy (Replit / load balancer) so secure cookies work
 app.set("trust proxy", 1);
 
 app.use(

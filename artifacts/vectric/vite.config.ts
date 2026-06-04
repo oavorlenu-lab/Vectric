@@ -53,20 +53,17 @@ export default defineConfig({
     },
     proxy: {
       "/api": {
-        target: "https://vectric.onrender.com",
+        target: "http://localhost:8080",
         changeOrigin: true,
-        secure: true,
       },
       "/sitemap.xml": {
-        target: "https://vectric.onrender.com",
+        target: "http://localhost:8080",
         changeOrigin: true,
-        secure: true,
         rewrite: () => "/api/sitemap.xml",
       },
       "/robots.txt": {
-        target: "https://vectric.onrender.com",
+        target: "http://localhost:8080",
         changeOrigin: true,
-        secure: true,
         rewrite: () => "/api/robots.txt",
       },
     },
