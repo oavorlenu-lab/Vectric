@@ -117,12 +117,14 @@ export default function BlogPost() {
     { name: post.seoTitle || post.title, url: `/blog/${post.slug}` },
   ];
 
+  const ogImageUrl = `/api/og-image?title=${encodeURIComponent(post.seoTitle || post.title)}${post.categoryName ? `&category=${encodeURIComponent(post.categoryName)}` : ""}`;
+
   return (
     <PublicLayout>
       <SeoHead
         title={post.seoTitle || post.title}
         description={post.seoDescription || post.excerpt || undefined}
-        image={post.featuredImageUrl}
+        image={ogImageUrl}
         type="article"
         article={{
           publishedAt: post.publishedAt || post.createdAt,

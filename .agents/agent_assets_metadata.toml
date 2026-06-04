@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "kqaiSoqqvD8OJHS00zMEo"
+uri = "file://attached_assets/sample-og.jpg"
+type = "image"
+title = "Sample OG image — AI & Technology post"

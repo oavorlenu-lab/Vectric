@@ -12,6 +12,7 @@ import settingsRouter from "./settings";
 import aiRouter from "./ai";
 import usersRouter from "./users";
 import statsRouter from "./stats";
+import ogRouter from "./og";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(settingsRouter);
 router.use(aiRouter);
 router.use(usersRouter);
 router.use(statsRouter);
+router.use(ogRouter);
 
 export default router;
