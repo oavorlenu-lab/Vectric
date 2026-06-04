@@ -36,7 +36,7 @@ export default function AdminSettings() {
     "siteName","siteTagline","siteDescription","logoUrl","faviconUrl",
     "googleAnalyticsId","googleSearchConsoleCode","adsenseClientId","grokApiKey",
     "footerText","socialLinks","headerMenu","footerMenu","contactEmail","contactAddress",
-    "resendApiKey","newsletterFromEmail","enableUserRegistration","maintenanceMode",
+    "resendApiKey","newsletterFromEmail","maintenanceMode",
   ];
 
   const handleSave = () => {
@@ -287,14 +287,6 @@ export default function AdminSettings() {
               <p className="text-xs text-gray-500">Shown on the Contact page. Leave blank to hide the address section.</p>
             </div>
 
-            <div className="flex items-center justify-between pt-2">
-              <div className="space-y-0.5">
-                <Label>User Registration</Label>
-                <p className="text-xs text-gray-500">Allow visitors to create accounts</p>
-              </div>
-              <Switch checked={formData.enableUserRegistration} onCheckedChange={v => handleChange("enableUserRegistration", v)} />
-            </div>
-            
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="space-y-0.5">
                 <Label className="text-red-600">Maintenance Mode</Label>
