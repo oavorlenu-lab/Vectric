@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useGetPost, useCreatePost, useUpdatePost, useListCategories, useSendNewsletter, useGetSettings } from "@workspace/api-client-react";
+import { buildPostEmailHtml } from "@/lib/emailTemplate";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -212,15 +213,21 @@ export default function AdminPostEditor() {
       toast.error("Subject is required");
       return;
     }
-    const postUrl = `${window.location.origin}/blog/${slug}`;
-    const html = `
-      <h1>${title}</h1>
-      ${excerpt ? `<p><em>${excerpt}</em></p>` : ""}
-      <p>${content.replace(/<[^>]*>/g, " ").substring(0, 300)}…</p>
-      <p><a href="${postUrl}" style="display:inline-block;background:#000;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-weight:600;">Read full article</a></p>
-      <hr/>
-      <p style="color:#888;font-size:12px;">You're receiving this because you subscribed to ${settings?.siteName || "our newsletter"}.</p>
-    `;
+    const siteUrl = window.location.origin;
+    const postUrl = `${siteUrl}/blog/${slug}`;
+    const categoryName = categories?.find(c => c.id === categoryId)?.name || null;
+    const html = buildPostEmailHtml({
+      siteName: settings?.siteName || "Vectric",
+      siteUrl,
+      postTitle: title,
+      postUrl,
+      excerpt: excerpt || null,
+      contentPreview: content || null,
+      featuredImageUrl: featuredImageUrl || null,
+      categoryName,
+      authorName: authorName || null,
+      publishedAt: new Date().toISOString(),
+    });
     sendNewsletter.mutate(
       { data: { subject: nlSubject, html, fromName: nlFromName || undefined } },
       {
