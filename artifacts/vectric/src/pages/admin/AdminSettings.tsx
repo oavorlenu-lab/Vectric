@@ -35,7 +35,7 @@ export default function AdminSettings() {
   const SETTINGS_FIELDS = [
     "siteName","siteTagline","siteDescription","logoUrl","faviconUrl",
     "googleAnalyticsId","googleSearchConsoleCode","adsenseClientId","grokApiKey",
-    "footerText","socialLinks","headerMenu","footerMenu","contactEmail",
+    "footerText","socialLinks","headerMenu","footerMenu","contactEmail","contactAddress",
     "resendApiKey","newsletterFromEmail","enableUserRegistration","maintenanceMode",
   ];
 
@@ -162,9 +162,9 @@ export default function AdminSettings() {
             </div>
             
             <div className="space-y-2">
-              <Label>Grok AI API Key</Label>
-              <Input type="password" value={formData.grokApiKey || ""} onChange={e => handleChange("grokApiKey", e.target.value)} placeholder="xai-..." />
-              <p className="text-xs text-gray-500">Required for the AI Writing Assistant features.</p>
+              <Label>Groq API Key</Label>
+              <Input type="password" value={formData.grokApiKey || ""} onChange={e => handleChange("grokApiKey", e.target.value)} placeholder="gsk_..." />
+              <p className="text-xs text-gray-500">Required for the AI Writing Assistant. Get a free key at <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" className="underline text-blue-600">console.groq.com</a>.</p>
             </div>
           </div>
 
@@ -278,7 +278,13 @@ export default function AdminSettings() {
             
             <div className="space-y-2">
               <Label>Contact Email</Label>
-              <Input value={formData.contactEmail || ""} onChange={e => handleChange("contactEmail", e.target.value)} />
+              <Input value={formData.contactEmail || ""} onChange={e => handleChange("contactEmail", e.target.value)} placeholder="hello@yoursite.com" />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Contact Address</Label>
+              <Textarea value={formData.contactAddress || ""} onChange={e => handleChange("contactAddress", e.target.value)} placeholder={"123 Main Street\nCity, Country"} rows={2} />
+              <p className="text-xs text-gray-500">Shown on the Contact page. Leave blank to hide the address section.</p>
             </div>
 
             <div className="flex items-center justify-between pt-2">

@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import bcrypt from "bcryptjs";
-import { db, usersTable } from "@workspace/db";
+import { db, usersTable, siteSettingsTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { RegisterUserBody, LoginUserBody } from "@workspace/api-zod";
 import { requireAdmin } from "../middlewares/auth";
@@ -8,6 +8,12 @@ import { requireAdmin } from "../middlewares/auth";
 const router: IRouter = Router();
 
 router.post("/users/register", async (req, res): Promise<void> => {
+  const [settings] = await db.select().from(siteSettingsTable);
+  if (!settings?.enableUserRegistration) {
+    res.status(403).json({ error: "Registration is currently disabled." });
+    return;
+  }
+
   const parsed = RegisterUserBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

@@ -1,10 +1,12 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { CookieBanner } from "@/components/CookieBanner";
+import { useGetSettings } from "@workspace/api-client-react";
+import { useEffect } from "react";
 
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
@@ -39,6 +41,55 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+function GoogleAnalytics({ id }: { id: string }) {
+  useEffect(() => {
+    if (!id || document.getElementById("ga-script")) return;
+    const s = document.createElement("script");
+    s.id = "ga-script";
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
+    s.async = true;
+    document.head.appendChild(s);
+    const i = document.createElement("script");
+    i.id = "ga-init";
+    i.textContent = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${id}');`;
+    document.head.appendChild(i);
+  }, [id]);
+  return null;
+}
+
+function MaintenanceScreen() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 text-center">
+      <div className="text-6xl mb-6">🔧</div>
+      <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">Under Maintenance</h1>
+      <p className="text-lg text-gray-500 max-w-md">We're making some improvements. We'll be back shortly. Thanks for your patience.</p>
+    </div>
+  );
+}
+
+function AppShell() {
+  const { data: settings } = useGetSettings();
+  const [location] = useLocation();
+  const isAdmin = location.startsWith("/admin");
+
+  useEffect(() => {
+    if (settings?.googleAnalyticsId) {
+      // handled by GoogleAnalytics component below
+    }
+  }, [settings?.googleAnalyticsId]);
+
+  if (settings?.maintenanceMode && !isAdmin) {
+    return <MaintenanceScreen />;
+  }
+
+  return (
+    <>
+      {settings?.googleAnalyticsId && <GoogleAnalytics id={settings.googleAnalyticsId} />}
+      <Router />
+    </>
+  );
+}
 
 function Router() {
   return (
@@ -82,7 +133,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
+            <AppShell />
           </WouterRouter>
           <Toaster position="top-center" />
           <CookieBanner />

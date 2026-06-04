@@ -337,6 +337,8 @@ export interface SiteSettings {
   /** @nullable */
   contactEmail?: string | null;
   /** @nullable */
+  contactAddress?: string | null;
+  /** @nullable */
   resendApiKey?: string | null;
   /** @nullable */
   newsletterFromEmail?: string | null;
@@ -360,6 +362,7 @@ export interface SiteSettingsUpdate {
   headerMenu?: string;
   footerMenu?: string;
   contactEmail?: string;
+  contactAddress?: string;
   resendApiKey?: string;
   newsletterFromEmail?: string;
   enableUserRegistration?: boolean;

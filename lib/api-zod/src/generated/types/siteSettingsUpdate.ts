@@ -21,6 +21,7 @@ export interface SiteSettingsUpdate {
   headerMenu?: string;
   footerMenu?: string;
   contactEmail?: string;
+  contactAddress?: string;
   resendApiKey?: string;
   newsletterFromEmail?: string;
   enableUserRegistration?: boolean;

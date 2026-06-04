@@ -64,15 +64,17 @@ export default function Contact() {
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <MapPin className="w-6 h-6" />
+              {settings?.contactAddress && (
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                    <MapPin className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg mb-1">Headquarters</h3>
+                    <p className="text-muted-foreground" style={{ whiteSpace: "pre-line" }}>{settings.contactAddress}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-lg mb-1">Headquarters</h3>
-                  <p className="text-muted-foreground">100 Publishing Way<br />New York, NY 10001</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
           

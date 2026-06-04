@@ -37,6 +37,8 @@ export interface SiteSettings {
   /** @nullable */
   contactEmail?: string | null;
   /** @nullable */
+  contactAddress?: string | null;
+  /** @nullable */
   resendApiKey?: string | null;
   /** @nullable */
   newsletterFromEmail?: string | null;
